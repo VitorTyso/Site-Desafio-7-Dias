@@ -4,7 +4,6 @@ type WaitlistPayload = {
   name: string;
   email: string;
   whatsapp: string;
-  company?: string;
   page?: string;
   source?: string;
   createdAt?: string;
@@ -53,12 +52,6 @@ export async function POST(request: Request) {
     const name = normalizeText(body.name);
     const email = normalizeText(body.email).toLowerCase();
     const whatsapp = normalizeWhatsapp(normalizeText(body.whatsapp));
-    const company = normalizeText(body.company);
-
-    if (company) {
-      return NextResponse.json({ ok: true });
-    }
-
     if (!name || name.length < 2) {
       return NextResponse.json(
         { ok: false, message: "Informe um nome valido." },

@@ -25,7 +25,6 @@ export default function WaitlistPage() {
       name: String(form.get("name") || "").trim(),
       email: String(form.get("email") || "").trim(),
       whatsapp: String(form.get("whatsapp") || "").trim(),
-      company: String(form.get("company") || "").trim(),
       createdAt: new Date().toISOString(),
       source: "landing-desafio-atencao",
       page: window.location.pathname
@@ -87,15 +86,6 @@ export default function WaitlistPage() {
 
         <div className="mx-auto max-w-2xl rounded-[2.4rem] bg-[linear-gradient(180deg,#fafbfd_0%,#f4f6f8_100%)] p-6 ring-1 ring-black/5 md:p-8">
           <form ref={formRef} className="space-y-5" onSubmit={handleSubmit}>
-            <input
-              name="company"
-              type="text"
-              tabIndex={-1}
-              autoComplete="off"
-              className="hidden"
-              aria-hidden="true"
-            />
-
             <div>
               <label htmlFor="name" className="mb-2 block text-sm font-medium text-ink">
                 Nome
