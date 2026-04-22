@@ -1,0 +1,77 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top, rgba(182, 192, 204, 0.1), transparent 26%),
+    linear-gradient(180deg, #ffffff 0%, #fbfbfd 36%, #f7f8fa 100%);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.5));
+  z-index: -1;
+}
+
+::selection {
+  background: rgba(172, 184, 198, 0.22);
+}
+
+@keyframes auroraFloat {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(10px, -14px, 0) scale(1.08);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes auroraFloatReverse {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(-12px, 10px, 0) scale(0.96);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .surface {
+    @apply bg-white/80 shadow-panel backdrop-blur-xl ring-1 ring-black/6;
+  }
+
+  .hairline {
+    @apply border border-line;
+  }
+
+  .aurora-blob {
+    animation: auroraFloat 10s ease-in-out infinite;
+  }
+
+  .aurora-blob-reverse {
+    animation: auroraFloatReverse 12s ease-in-out infinite;
+  }
+}
