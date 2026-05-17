@@ -79,7 +79,7 @@ export default function WaitlistPage() {
             Receba a abertura da proxima turma.
           </h1>
           <p className="mx-auto mt-5 max-w-2xl text-balance text-base leading-7 text-mist md:text-lg">
-            Deixe seus dados para ser avisado quando o Desafio 7 Dias para recuperar sua atenção
+            Deixe seus dados para ser avisado quando o Desafio da Atenção
             reabrir.
           </p>
         </section>

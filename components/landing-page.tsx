@@ -12,7 +12,7 @@ const landingConfig = {
 // Ajuste aqui o texto de lista de espera / abertura da proxima turma.
 const waitlistConfig = {
   nextCohort: "Proxima turma em breve",
-  ctaLabel: "Lista de Espera",
+  ctaLabel: "Entrar na lista - é gratuito",
   link: "/lista-de-espera"
 };
 
@@ -20,7 +20,9 @@ const waitlistConfig = {
 const footerConfig = {
   verifyLink: "/lista-de-espera",
   privacyLink: "/politica-de-privacidade",
-  email: "contato@unumpercent.com.br"
+  email: "contato@unumpercent.com.br",
+  youtubeLink: "https://www.youtube.com/@VitorTyso",
+  diagnosisLink: "https://distra-o-digital.vercel.app"
 };
 
 const painCards = [
@@ -128,17 +130,17 @@ const faqItems = [
   {
     question: "E se eu tiver pouco tempo?",
     answer:
-      "O desafio foi desenhado para ser direto. A proposta é reorganizar sua atenção, não adicionar mais complexidade à sua rotina."
+      "Esse é exatamente o sintoma. Quando a atenção está fragmentada, a sensação é de que o tempo sumiu. O desafio não adiciona mais uma tarefa na sua lista - ele remove o que está consumindo seu tempo sem você perceber. São 10 minutos por dia de aula. Se você não tem 10 minutos, o problema é maior do que você imagina. E é por isso que você precisa disso."
   },
   {
     question: "E se eu me dispersar no meio?",
     answer:
-      "A estrutura foi pensada justamente para quem já sente dificuldade de continuidade. O método trabalha redução de ruído e passos sustentáveis."
+      "A estrutura foi desenhada para quem já tem dificuldade de continuidade. A Ação Mínima Viável existe justamente para isso: criar passos tão pequenos que é impossível não executar. Você não precisa de motivação. Precisa de um passo menor."
   },
   {
     question: "E se eu já tentei outras coisas?",
     answer:
-      "A diferença aqui é que o foco não está em motivação ou hacks soltos, mas em reorganizar o sistema que influencia sua atenção."
+      "Porque as outras coisas tentavam te dar mais motivação, mais técnica, mais método - enquanto o ambiente continuava te fragmentando ativamente. Você não falhou. O método errado falhou. Esse protocolo começa pelo ambiente antes de exigir qualquer mudança de comportamento."
   },
   {
     question: "Isso é terapia?",
@@ -153,8 +155,22 @@ const faqItems = [
   {
     question: "Em 7 dias já dá para perceber diferença?",
     answer:
-      "Sim, a proposta não resolver tudo em uma semana, mas recomeçar uma reogarnização prática que gera resultados ao longo da vida."
+      "A primeira semana é de preparação - você estuda e prepara o terreno. A segunda semana é o desafio aplicado. A maioria das pessoas já sente diferença na clareza mental ainda na primeira semana - quando param de consumir o que fragmenta a atenção. O resultado completo se consolida nas semanas seguintes."
+  },
+  {
+    question: "Preciso pensar mais antes de decidir.",
+    answer:
+      "A mente que precisa de mais tempo para decidir sobre algo que já sabe que precisa - é uma mente fragmentada. A garantia de 7 dias existe para que o risco seja zero. Entre, experimente, decida depois."
   }
+];
+
+const authorStoryParagraphs = [
+  "Passei 15 anos trabalhando em algo que não fazia sentido para mim. Atravessei 8 cidades. Fiquei anos longe da mulher que eu amava.",
+  "Eu estava acordado de corpo. Morto por dentro.",
+  "Achava que o problema era eu. Que faltava disciplina. Que algo em mim estava errado.",
+  "Até que entendi: o problema nunca foi eu. Foi para onde eu estava direcionando minha atenção - e quem estava se beneficiando disso.",
+  "Quando acordei para isso, criei um protocolo. Testei em mim mesmo. Os resultados foram concretos: clareza mental, presença recuperada, projetos saindo do papel.",
+  "Eu poderia ter entendido isso aos 25. Fui entender aos 40. Não quero que você espere tanto."
 ];
 
 const fadeUp = {
@@ -221,7 +237,7 @@ function DeviceMockup() {
             <div className="mx-auto mb-4 h-1.5 w-20 rounded-full bg-black/10" />
             <div className="rounded-[2rem] bg-[linear-gradient(180deg,#f7f8fb_0%,#eef2f6_100%)] p-5">
               <div className="text-[0.65rem] uppercase tracking-[0.2em] text-mist">
-                Desafio 7 Dias
+                Desafio da Atenção
               </div>
               <div className="mt-4 font-serif text-3xl leading-none tracking-[-0.05em] text-ink">
                 Atenção
@@ -277,7 +293,7 @@ function DeviceMockup() {
                   Não é falta de Disciplina.
                 </div>
                 <p className="mt-4 max-w-sm text-sm leading-6 text-mist md:text-base">
-                  É sua atenção sendo roubada, fragmentada em dezenas de pequenas promessas diárias que você nem vê chegar: abas abertas, notificações, urgências artificiais e a sensação constante de estar ocupada sem sair do lugar.
+                  É sua atenção sendo roubada, fragmentada em dezenas de pequenas promessas diárias que você nem vê chegar: abas abertas, notificações, urgências artificiais e a sensação constante de estar ocupado sem sair do lugar.
                 </p>
               </div>
 
@@ -368,7 +384,7 @@ export function LandingPage() {
             href={waitlistConfig.link}
             className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-ink transition hover:bg-black/[0.035]"
           >
-            Entrar no desafio
+            {waitlistConfig.ctaLabel}
           </a>
         </div>
       </header>
@@ -383,16 +399,19 @@ export function LandingPage() {
               variants={fadeUp}
             >
               <p className="text-[0.8rem] font-semibold uppercase tracking-[0.24em] text-slateSoft">
-                Desafio 7 Dias
+                Desafio da Atenção
               </p>
               <h1 className="mt-5 text-balance font-serif text-[4.2rem] leading-[0.9] tracking-[-0.075em] text-ink sm:text-[5.8rem] md:text-[7.4rem] lg:text-[8.8rem]">
-                Recupere sua atenção em 7 dias.
+                Saia do automático - antes que a vida passe sem você.
               </h1>
               <p className="mx-auto mt-6 max-w-3xl text-balance text-base leading-7 text-mist md:text-xl md:leading-8">
-                Um protocolo prático para reduzir sobrecarga mental, recuperar clareza e voltar a ter direção.
+                Um protocolo de 14 dias para proteger o que está sendo roubado de você todos os dias - e voltar a sentir que sua vida está andando.
+              </p>
+              <p className="mx-auto mt-4 max-w-3xl text-balance text-sm font-semibold italic leading-7 text-[#7c322e] md:text-lg">
+                O ambiente foi projetado para roubar sua atenção. Você estava lutando sem saber que tinha um inimigo.
               </p>
               <p className="mx-auto mt-4 max-w-2xl text-balance text-base leading-7 text-ink/80 md:text-lg">
-                A proposta é simples: foco, clareza e presença em sete aulas.
+                A proposta é simples: foco, clareza e presença ao longo de 14 dias.
               </p>
               <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <a
@@ -402,10 +421,10 @@ export function LandingPage() {
                   {waitlistConfig.ctaLabel}
                 </a>
                 <a
-                  href="#mecanismo"
+                  href={waitlistConfig.link}
                   className="inline-flex min-h-11 items-center justify-center rounded-full px-6 text-sm font-medium text-ink transition hover:bg-black/[0.03]"
                 >
-                  Ver como funciona
+                  {waitlistConfig.ctaLabel}
                 </a>
               </div>
 
@@ -487,6 +506,31 @@ export function LandingPage() {
           </motion.div>
         </section>
 
+        <section className="py-10 md:py-14">
+          <motion.div
+            className="mx-auto max-w-4xl border-y border-black/6 px-6 py-10 text-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.4 }}
+            variants={fadeUp}
+          >
+            <p className="text-lg font-medium tracking-[-0.03em] text-ink">
+              Você não precisa continuar assim.
+            </p>
+            <div className="mt-5">
+              <a
+                href={waitlistConfig.link}
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-white transition hover:bg-black/88"
+              >
+                {waitlistConfig.ctaLabel}
+              </a>
+            </div>
+            <p className="mt-4 text-sm leading-6 text-mist">
+              Garantia de 7 dias. Sem questionamento.
+            </p>
+          </motion.div>
+        </section>
+
         <section id="mecanismo" className="py-20 md:py-28">
           <motion.div
             className="mx-auto max-w-4xl text-center"
@@ -527,7 +571,7 @@ export function LandingPage() {
         <section id="estrutura" className="py-20 md:py-28">
           <SectionHeader
             eyebrow="Estrutura do desafio"
-            title="7 Etapas para reogarnizar sua Atenção"
+            title="7 Etapas para reorganizar sua Atenção"
             subtitle=""
           />
 
@@ -617,18 +661,20 @@ export function LandingPage() {
               <h2 className="font-serif text-[2.9rem] leading-[0.98] tracking-[-0.055em] text-ink sm:text-[4rem] md:text-[5rem]">
                 Criado por Vitor Tyso
               </h2>
-              <p className="mx-auto mt-6 max-w-2xl text-balance text-base leading-7 text-mist md:mx-0 md:text-xl md:leading-8">
-                Pesquisador independente sobre atenção, sobrecarga informacional e clareza mental.
-              </p>
-              <p className="mx-auto mt-4 max-w-3xl text-balance text-base leading-7 text-mist md:mx-0 md:text-lg">
-                Este protocolo foi construído a partir de anos estudando o tema e de 15 anos observando comportamento, decisão sob pressão e os efeitos do excesso sobre a execução.
-              </p>
-              <p className="mx-auto mt-4 max-w-3xl text-balance text-base leading-7 text-mist md:mx-0 md:text-lg">
-                Não é uma teoria genérica de foco.
-              </p>
-              <p className="mx-auto mt-4 max-w-3xl text-balance text-base leading-7 text-mist md:mx-0 md:text-lg">
-                É uma construção independente, feita para ajudar pessoas reais a recuperar discernimento em meio ao excesso.
-              </p>
+              <div className="mt-6 space-y-4">
+                {authorStoryParagraphs.map((paragraph) => (
+                  <p
+                    key={paragraph}
+                    className={`mx-auto max-w-3xl text-balance text-base leading-7 md:mx-0 md:text-lg ${
+                      paragraph === "Eu estava acordado de corpo. Morto por dentro."
+                        ? "font-semibold text-[#7c322e]"
+                        : "text-mist"
+                    }`}
+                  >
+                    {paragraph}
+                  </p>
+                ))}
+              </div>
             </div>
           </motion.div>
         </section>
@@ -686,7 +732,7 @@ export function LandingPage() {
                 Comece a recuperar sua atenção hoje.
               </h2>
               <p className="mx-auto mt-5 max-w-2xl text-balance text-base leading-7 text-mist md:text-lg">
-                Acesso ao Desafio 7 Dias para recuperar sua atenção por {landingConfig.price}.
+                Acesso ao Desafio da Atenção por {landingConfig.price}.
               </p>
 
               <div className="mt-10 font-serif text-[3.8rem] leading-none tracking-[-0.06em] text-ink sm:text-[4.8rem] md:text-[6.2rem]">
@@ -727,6 +773,41 @@ export function LandingPage() {
         </section>
 
         <section className="py-20 md:py-28">
+          <motion.div
+            className="rounded-[2.75rem] bg-[#f5f5f7] px-6 py-14 text-center ring-1 ring-black/5 md:px-12 md:py-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.35 }}
+            variants={fadeUp}
+          >
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slateSoft">
+              Prova pessoal
+            </p>
+            <h2 className="mt-4 font-serif text-[2.9rem] leading-[0.96] tracking-[-0.055em] text-ink sm:text-[4rem] md:text-[4.8rem]">
+              Testado antes de ser ensinado.
+            </h2>
+            <p className="mx-auto mt-6 max-w-3xl text-balance text-lg leading-8 text-mist">
+              Antes de criar qualquer aula, apliquei esse protocolo em mim mesmo por 30 dias.
+            </p>
+            <p className="mx-auto mt-3 max-w-3xl text-balance text-lg leading-8 text-mist">
+              Sem contar calorias. Sem dieta especial. Apenas recuperando o controle da minha atenção.
+            </p>
+            <p className="mx-auto mt-3 max-w-3xl text-balance text-lg leading-8 text-mist">
+              Resultado: 8kg a menos na balança, meses sem álcool, silêncio mental recuperado, presença real com quem amo.
+            </p>
+            <p className="mx-auto mt-3 max-w-3xl text-balance text-lg leading-8 text-mist">
+              Mas o resultado mais importante foi esse: voltei a sentir que a minha vida estava andando.
+            </p>
+
+            <div className="mx-auto mt-8 max-w-xl rounded-[1.8rem] border border-[#7c322e]/30 bg-white/70 px-6 py-5 text-center shadow-[0_18px_50px_rgba(124,50,46,0.08)]">
+              <p className="text-lg font-medium tracking-[-0.03em] text-[#7c322e]">
+                IAT inicial: 4 | IAT após 30 dias: 17
+              </p>
+            </div>
+          </motion.div>
+        </section>
+
+        <section className="py-20 md:py-28">
           <SectionHeader
             eyebrow="Objeções"
             title="Perguntas frequentes"
@@ -759,6 +840,14 @@ export function LandingPage() {
             <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-mist md:text-xl md:leading-8">
               Comece agora a reorganizar sua mente, seu ambiente e sua direção.
             </p>
+            <div className="mt-8">
+              <a
+                href={waitlistConfig.link}
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-white transition hover:bg-black/88"
+              >
+                {waitlistConfig.ctaLabel}
+              </a>
+            </div>
           </motion.div>
         </section>
 
@@ -778,6 +867,26 @@ export function LandingPage() {
                 >
                   Receber informações da próxima turma
                 </a>
+                <div className="mt-5 flex flex-col gap-2 text-base leading-7 text-mist">
+                  <a
+                    href={footerConfig.youtubeLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[#6d5ef3] transition hover:opacity-80"
+                  >
+                    YouTube
+                  </a>
+                  <span>Instagram em breve</span>
+                  <span>TikTok em breve</span>
+                  <a
+                    href={footerConfig.diagnosisLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[#6d5ef3] transition hover:opacity-80"
+                  >
+                    Diagnóstico gratuito
+                  </a>
+                </div>
               </div>
 
               <div>
@@ -793,17 +902,15 @@ export function LandingPage() {
               </div>
             </div>
 
-            <div className="mt-6 grid gap-4 text-base text-mist md:grid-cols-[1fr_auto_auto_auto] md:items-center">
+            <div className="mt-6 grid gap-4 text-base text-mist md:grid-cols-[1fr_auto_auto] md:items-start">
               <div>
-                <span className="font-medium text-ink">© 2026 Vitor Tyso</span> — Todos os direitos reservados
+                <span className="font-medium text-ink">© 2026 Vitor Tyso — Desafio da Atenção</span>
+                <div className="mt-2 text-sm italic text-[#7c322e]">Você vale mais.</div>
               </div>
               <a href={footerConfig.privacyLink} className="text-[#6d5ef3] transition hover:opacity-80">
                 Política de Privacidade
               </a>
               <div>{footerConfig.email}</div>
-              <div>
-                Powered by <span className="font-medium text-ink">Vitor Tyso</span>
-              </div>
             </div>
           </div>
         </footer>

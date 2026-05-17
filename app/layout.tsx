@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Desafio de 7 dias para recuperar sua atenção",
+  title: "Desafio da Atenção - Saia do Automático | Vitor Tyso",
   description:
-    "Um protocolo de 7 dias para sair da sobrecarga mental e voltar a ter clareza."
+    "Sua atenção está sendo roubada todos os dias. O Desafio da Atenção é um protocolo de 14 dias para sair do automático antes que a vida passe sem você."
 };
 
 export default function RootLayout({
