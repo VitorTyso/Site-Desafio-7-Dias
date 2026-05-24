@@ -1,22 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 
-// Pontos editaveis principais da oferta.
-const landingConfig = {
-  price: "R$ 197",
-  checkoutUrl: "#"
-};
-
-// Ajuste aqui o texto de lista de espera / abertura da proxima turma.
 const waitlistConfig = {
-  nextCohort: "Proxima turma em breve",
-  ctaLabel: "Entrar na lista - é gratuito",
-  link: "/lista-de-espera"
+  ctaLabel: "Quero sair do automático",
+  link: "/lista-de-espera",
+  supportText: "Entre na lista gratuita para receber a abertura da próxima turma."
 };
 
-// Ajuste aqui os dados do rodape final.
 const footerConfig = {
   verifyLink: "/lista-de-espera",
   privacyLink: "/politica-de-privacidade",
@@ -25,326 +18,357 @@ const footerConfig = {
   diagnosisLink: "https://distra-o-digital.vercel.app"
 };
 
-const painCards = [
-  {
-    title: "Excesso de informação",
-    description: "Você recebe mais estímulos do que consegue processar com qualidade."
-  },
-  {
-    title: "Atenção fragmentada",
-    description: "Sua mente alterna entre tarefas, notificações, preocupações e urgências."
-  },
-  {
-    title: "Decisões travadas",
-    description: "Até o que é simples começa a parecer pesado quando tudo compete ao mesmo tempo."
-  },
-  {
-    title: "Execução inconsistente",
-    description: "Você sabe o que precisa fazer, mas não consegue sustentar presença para avançar."
-  }
+const symptomCards = [
+  "Você pega o celular sem perceber",
+  "Consome muito e aplica pouco",
+  "Sua mente parece constantemente cansada",
+  "Tem dificuldade de presença",
+  "Sente os dias passando rápido",
+  "Começa coisas e abandona",
+  "Vive mentalmente fragmentado",
+  "Se sente perdido mesmo consumindo muito conteúdo"
 ];
 
-const structureItems = [
-  {
-    index: "01",
-    eyebrow: "Leitura inicial",
-    title: "Diagnóstico",
-    description: "Identifique com clareza o que hoje dispersa sua atenção e compromete sua execução."
-  },
-  {
-    index: "02",
-    eyebrow: "Arquitetura do método",
-    title: "Metodologia – Framework",
-    description: "Base onde se apoiam todas as mudanças."
-  },
-  {
-    index: "03",
-    eyebrow: "Decisão prática",
-    title: "SSC – Start Stop Continue",
-    description: "Defina com objetividade o que começar, o que interromper e o que sustentar."
-  },
-  {
-    index: "04",
-    eyebrow: "Entrada de informação",
-    title: "Curadoria de informações",
-    description: "Reduza excesso, filtre melhor e recupere espaço mental para pensar."
-  },
-  {
-    index: "05",
-    eyebrow: "Contexto de execução",
-    title: "Ambiente",
-    description: "Ajuste o espaço físico e digital para favorecer presença, foco e continuidade."
-  },
-  {
-    index: "06",
-    eyebrow: "Movimento com coerência",
-    title: "Projeto Ação Emoção",
-    description: "Recupere um projeto antigo que gostaria de realizar."
-  },
-  {
-    index: "07",
-    eyebrow: "Sustentação",
-    title: "AMV – Ação mínima viável",
-    description: "Crie continuidade com passos pequenos, concretos e sustentáveis."
-  }
+const thesisStatements = [
+  "A atenção é o recurso mais valioso da sua vida.",
+  "O ambiente moderno foi construído para capturar sua mente.",
+  "Talvez você não esteja perdido. Talvez exista ruído demais."
 ];
 
-const transformationPanels = [
+const weekBlocks = [
   {
-    title: "Menos ruído",
-    description: "Reduza o excesso mental e pare de carregar mais do que precisa."
+    label: "Semana 1",
+    title: "Consciência e leitura do ruído",
+    items: ["entendimento", "consciência", "atenção", "ambiente", "ruído"]
   },
   {
-    title: "Mais direção",
-    description: "Tome decisões com menos fricção e mais clareza."
-  },
-  {
-    title: "Mais continuidade",
-    description: "Crie um contexto que favorece ação real, e não só intenção."
+    label: "Semana 2",
+    title: "Aplicação e reconstrução prática",
+    items: ["ações reais", "menos distrações", "rotina", "presença", "direção"]
   }
 ];
 
 const beforeAfterItems = [
   {
-    before: "Consome muito e executa pouco.",
-    after: "Distingue melhor o que merece atenção e volta a agir com continuidade."
+    before: "Mente fragmentada, excesso de estímulo e sensação de vida no automático.",
+    after: "Mais clareza para pensar, mais presença para agir e mais critério para escolher o que merece atenção."
   },
   {
-    before: "Tudo parece urgente e mentalmente pesado.",
-    after: "As decisões ficam mais leves porque há menos ruído e mais critério."
+    before: "Dias cheios de consumo, ansiedade mental e baixa continuidade.",
+    after: "Menos ruído interno, mais direção prática e uma sensação concreta de retomada da própria vida."
   },
   {
-    before: "Termina o dia cansado, mas sem avanço real.",
-    after: "Recupera a percepção de direção e move o que realmente importa."
+    before: "Muitas tentativas soltas e pouca direção sustentada.",
+    after: "Contexto mais favorável, decisões menos drenantes e foco real no que importa."
   }
 ];
 
-const offerHighlights = [
-  "7 etapas práticas",
-  "Acesso imediato",
-  "Feito para reduzir sobrecarga e recuperar clareza",
-  "Garantia de 7 dias"
+const proofCards = [
+  {
+    eyebrow: "origem prática",
+    value: "14 dias",
+    detail: "de estrutura objetiva para sair do excesso e voltar a perceber a própria vida com mais nitidez."
+  },
+  {
+    eyebrow: "base real",
+    value: "silêncio",
+    detail: "como experiência concreta antes de virar proposta: menos ruído, menos impulso, mais presença."
+  },
+  {
+    eyebrow: "direção",
+    value: "retomada",
+    detail: "de rotina, corpo, projetos e relações quando a atenção volta para o lugar."
+  }
 ];
 
 const faqItems = [
   {
+    question: "Isso é para mim?",
+    answer:
+      "Se você sente que consome demais, aplica de menos e termina os dias com baixa presença, o desafio foi desenhado para você."
+  },
+  {
     question: "E se eu tiver pouco tempo?",
     answer:
-      "Esse é exatamente o sintoma. Quando a atenção está fragmentada, a sensação é de que o tempo sumiu. O desafio não adiciona mais uma tarefa na sua lista - ele remove o que está consumindo seu tempo sem você perceber. São 10 minutos por dia de aula. Se você não tem 10 minutos, o problema é maior do que você imagina. E é por isso que você precisa disso."
+      "A proposta é reduzir ruído, não adicionar complexidade. O desafio foi pensado para caber em uma rotina já sobrecarregada."
   },
   {
-    question: "E se eu me dispersar no meio?",
+    question: "Em 14 dias já dá para perceber diferença?",
     answer:
-      "A estrutura foi desenhada para quem já tem dificuldade de continuidade. A Ação Mínima Viável existe justamente para isso: criar passos tão pequenos que é impossível não executar. Você não precisa de motivação. Precisa de um passo menor."
-  },
-  {
-    question: "E se eu já tentei outras coisas?",
-    answer:
-      "Porque as outras coisas tentavam te dar mais motivação, mais técnica, mais método - enquanto o ambiente continuava te fragmentando ativamente. Você não falhou. O método errado falhou. Esse protocolo começa pelo ambiente antes de exigir qualquer mudança de comportamento."
+      "Sim. A primeira semana muda a forma como você enxerga o ambiente e o ruído. A segunda transforma isso em decisões e ações mais conscientes."
   },
   {
     question: "Isso é terapia?",
     answer:
-      "Não. É um método educacional sobre atenção, sobrecarga informacional e clareza mental."
+      "Não. É um protocolo educacional sobre atenção, excesso de estímulos, ambiente e direção prática."
   },
   {
     question: "Como funciona o acesso?",
     answer:
-      "Após a compra, o acesso é liberado para você iniciar o desafio e seguir as etapas."
-  },
-  {
-    question: "Em 7 dias já dá para perceber diferença?",
-    answer:
-      "A primeira semana é de preparação - você estuda e prepara o terreno. A segunda semana é o desafio aplicado. A maioria das pessoas já sente diferença na clareza mental ainda na primeira semana - quando param de consumir o que fragmenta a atenção. O resultado completo se consolida nas semanas seguintes."
-  },
-  {
-    question: "Preciso pensar mais antes de decidir.",
-    answer:
-      "A mente que precisa de mais tempo para decidir sobre algo que já sabe que precisa - é uma mente fragmentada. A garantia de 7 dias existe para que o risco seja zero. Entre, experimente, decida depois."
+      "Ao entrar na lista, você recebe aviso quando a próxima turma abrir e quando o acesso ao desafio estiver disponível."
   }
 ];
 
-const authorStoryParagraphs = [
-  "Passei 15 anos trabalhando em algo que não fazia sentido para mim. Atravessei 8 cidades. Fiquei anos longe da mulher que eu amava.",
-  "Eu estava acordado de corpo. Morto por dentro.",
-  "Achava que o problema era eu. Que faltava disciplina. Que algo em mim estava errado.",
-  "Até que entendi: o problema nunca foi eu. Foi para onde eu estava direcionando minha atenção - e quem estava se beneficiando disso.",
-  "Quando acordei para isso, criei um protocolo. Testei em mim mesmo. Os resultados foram concretos: clareza mental, presença recuperada, projetos saindo do papel.",
-  "Eu poderia ter entendido isso aos 25. Fui entender aos 40. Não quero que você espere tanto."
-];
-
 const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 30 },
   visible: (delay = 0) => ({
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.8,
+      duration: 0.9,
       delay,
       ease: [0.22, 1, 0.36, 1]
     }
   })
 };
 
-function SectionHeader({
+function NeuralField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const mobile = window.innerWidth < 768;
+    const particleCount = reducedMotion ? 24 : mobile ? 40 : 68;
+    const connectionDistance = mobile ? 132 : 196;
+    const pulseSpeed = reducedMotion ? 0.0005 : 0.0015;
+    const pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2, active: false };
+
+    const particles = Array.from({ length: particleCount }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      z: Math.random() * 0.9 + 0.2,
+      vx: (Math.random() - 0.5) * (reducedMotion ? 0.08 : 0.18),
+      vy: (Math.random() - 0.5) * (reducedMotion ? 0.08 : 0.18)
+    }));
+
+    let width = 0;
+    let height = 0;
+    let raf = 0;
+
+    const resize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+      pointer.active = true;
+    };
+
+    const handlePointerLeave = () => {
+      pointer.active = false;
+    };
+
+    const draw = (time: number) => {
+      context.clearRect(0, 0, width, height);
+
+      const pulse = (Math.sin(time * pulseSpeed) + 1) / 2;
+
+      for (const particle of particles) {
+        if (!reducedMotion) {
+          particle.x += particle.vx * particle.z;
+          particle.y += particle.vy * particle.z;
+        }
+
+        if (pointer.active) {
+          const dx = pointer.x - particle.x;
+          const dy = pointer.y - particle.y;
+          const distance = Math.hypot(dx, dy) || 1;
+
+          if (distance < 140) {
+            particle.x -= (dx / distance) * 0.12;
+            particle.y -= (dy / distance) * 0.12;
+          }
+        }
+
+        if (particle.x < -30) particle.x = width + 30;
+        if (particle.x > width + 30) particle.x = -30;
+        if (particle.y < -30) particle.y = height + 30;
+        if (particle.y > height + 30) particle.y = -30;
+      }
+
+      for (let index = 0; index < particles.length; index += 1) {
+        const a = particles[index];
+
+        for (let inner = index + 1; inner < particles.length; inner += 1) {
+          const b = particles[inner];
+          const dx = a.x - b.x;
+          const dy = a.y - b.y;
+          const distance = Math.hypot(dx, dy);
+
+          if (distance < connectionDistance) {
+            const opacity = 0.42 * (1 - distance / connectionDistance);
+            context.strokeStyle = `rgba(84, 103, 132, ${opacity})`;
+            context.lineWidth = 1.25;
+            context.beginPath();
+            context.moveTo(a.x, a.y);
+            context.lineTo(b.x, b.y);
+            context.stroke();
+
+            const pulseX = a.x + (b.x - a.x) * pulse;
+            const pulseY = a.y + (b.y - a.y) * pulse;
+            context.fillStyle = `rgba(255, 255, 255, ${opacity * 4.4})`;
+            context.beginPath();
+            context.arc(pulseX, pulseY, 2.8, 0, Math.PI * 2);
+            context.fill();
+          }
+        }
+      }
+
+      for (const particle of particles) {
+        context.fillStyle = `rgba(104, 124, 154, ${0.4 + particle.z * 0.26})`;
+        context.beginPath();
+        context.arc(particle.x, particle.y, 1.8 + particle.z * 2.5, 0, Math.PI * 2);
+        context.fill();
+      }
+
+      raf = window.requestAnimationFrame(draw);
+    };
+
+    resize();
+    raf = window.requestAnimationFrame(draw);
+    window.addEventListener("resize", resize);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerleave", handlePointerLeave);
+
+    return () => {
+      window.cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerleave", handlePointerLeave);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 h-full w-full opacity-95"
+    />
+  );
+}
+
+function HeroDepthObjects() {
+  const pointerX = useMotionValue(0);
+  const pointerY = useMotionValue(0);
+  const springX = useSpring(pointerX, { stiffness: 60, damping: 18, mass: 0.5 });
+  const springY = useSpring(pointerY, { stiffness: 60, damping: 18, mass: 0.5 });
+
+  const layerOneX = useTransform(springX, [-120, 120], [-16, 16]);
+  const layerOneY = useTransform(springY, [-120, 120], [-12, 12]);
+  const layerTwoX = useTransform(springX, [-120, 120], [20, -20]);
+  const layerTwoY = useTransform(springY, [-120, 120], [16, -16]);
+  const haloX = useTransform(springX, [-120, 120], [-28, 28]);
+  const haloY = useTransform(springY, [-120, 120], [-18, 18]);
+
+  useEffect(() => {
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reducedMotion) return;
+
+    const handleMove = (event: PointerEvent) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = Math.min(window.innerHeight / 2, 420);
+      pointerX.set((event.clientX - centerX) / 10);
+      pointerY.set((event.clientY - centerY) / 12);
+    };
+
+    const handleLeave = () => {
+      pointerX.set(0);
+      pointerY.set(0);
+    };
+
+    window.addEventListener("pointermove", handleMove);
+    window.addEventListener("pointerleave", handleLeave);
+
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      window.removeEventListener("pointerleave", handleLeave);
+    };
+  }, [pointerX, pointerY]);
+
+  return (
+    <div className="pointer-events-none absolute inset-0 hidden overflow-hidden md:block" aria-hidden="true">
+      <motion.div
+        style={{ x: haloX, y: haloY }}
+        className="absolute left-[2%] top-[6%] h-[460px] w-[460px] rounded-full bg-[radial-gradient(circle,rgba(71,93,126,0.28)_0%,rgba(120,141,172,0.1)_38%,transparent_74%)] blur-3xl"
+      />
+      <motion.div
+        style={{ x: layerOneX, y: layerOneY }}
+        className="absolute left-[7%] top-[32%] h-[300px] w-[240px] rounded-[2.8rem] border border-[rgba(84,104,133,0.18)] bg-[linear-gradient(180deg,rgba(111,133,163,0.08)_0%,rgba(111,133,163,0.02)_100%)] shadow-[0_70px_180px_rgba(67,87,116,0.18)] backdrop-blur-[3px] [transform:rotateX(18deg)_rotateY(-24deg)]"
+      />
+      <motion.div
+        style={{ x: layerTwoX, y: layerTwoY }}
+        className="absolute right-[6%] top-[18%] h-[360px] w-[280px] rounded-[3rem] border border-[rgba(84,104,133,0.2)] bg-[linear-gradient(180deg,rgba(108,128,156,0.08)_0%,rgba(108,128,156,0.015)_100%)] shadow-[0_80px_220px_rgba(67,87,116,0.22)] backdrop-blur-[3px] [transform:rotateX(14deg)_rotateY(22deg)]"
+      />
+      <motion.div
+        style={{ x: layerOneX, y: layerTwoY }}
+        className="absolute right-[23%] top-[55%] h-[180px] w-[180px] rounded-full border border-[rgba(84,104,133,0.18)] bg-[radial-gradient(circle,rgba(101,122,150,0.16)_0%,rgba(101,122,150,0.05)_48%,transparent_74%)] blur-md"
+      />
+      <motion.div
+        style={{ x: haloX, y: layerOneY }}
+        className="absolute left-[26%] top-[14%] h-[220px] w-[220px] rounded-full bg-[radial-gradient(circle,rgba(66,87,117,0.22)_0%,rgba(140,158,183,0.04)_45%,transparent_72%)] blur-2xl"
+      />
+      <motion.div
+        style={{ x: layerTwoX, y: haloY }}
+        className="absolute right-[28%] top-[14%] h-[120px] w-[320px] rounded-full border border-[rgba(84,104,133,0.14)] bg-[linear-gradient(90deg,rgba(102,124,153,0.12)_0%,rgba(102,124,153,0.02)_100%)] shadow-[0_28px_80px_rgba(67,87,116,0.14)] backdrop-blur-[2px] [transform:rotateX(18deg)_rotateY(-10deg)]"
+      />
+    </div>
+  );
+}
+
+function PrimaryCta({ className = "" }: { className?: string }) {
+  return (
+    <a
+      href={waitlistConfig.link}
+      className={`inline-flex min-h-11 items-center justify-center rounded-full border border-black/8 bg-[#121417] px-6 text-sm font-medium text-white shadow-[0_12px_40px_rgba(10,12,16,0.12)] transition hover:bg-[#1a1f26] ${className}`}
+    >
+      {waitlistConfig.ctaLabel}
+    </a>
+  );
+}
+
+function SectionIntro({
   eyebrow,
   title,
-  subtitle,
-  align = "center"
+  subtitle
 }: {
   eyebrow: string;
   title: string;
   subtitle?: string;
-  align?: "center" | "left";
 }) {
   return (
     <motion.div
-      className={align === "center" ? "mx-auto max-w-4xl text-center" : "max-w-3xl"}
+      className="mx-auto max-w-4xl text-center"
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.45 }}
+      viewport={{ once: true, amount: 0.3 }}
       variants={fadeUp}
     >
-      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slateSoft">
+      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#8b94a1]">
         {eyebrow}
       </p>
-      <h2 className="mt-4 text-balance font-serif text-[2.9rem] leading-[0.96] tracking-[-0.055em] text-ink sm:text-[4rem] md:text-[5.2rem]">
+      <h2 className="mt-4 text-balance font-serif text-[2.8rem] leading-[0.95] tracking-[-0.06em] text-[#111318] sm:text-[3.8rem] md:text-[5rem]">
         {title}
       </h2>
       {subtitle ? (
-        <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-mist md:text-lg">
+        <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-[#66707c] md:text-lg">
           {subtitle}
         </p>
       ) : null}
     </motion.div>
-  );
-}
-
-function DeviceMockup() {
-  return (
-    <motion.div
-      className="relative mx-auto mt-16 max-w-[840px]"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
-    >
-      <div className="aurora-blob absolute left-[10%] top-[12%] h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(158,170,187,0.2),transparent_72%)] blur-3xl" />
-      <div className="aurora-blob-reverse absolute right-[16%] top-[8%] h-40 w-40 rounded-full bg-[radial-gradient(circle,rgba(186,196,208,0.16),transparent_72%)] blur-3xl" />
-      <div className="grid gap-5 lg:grid-cols-[minmax(290px,320px)_minmax(460px,560px)] lg:items-center lg:justify-center">
-        <div className="mx-auto w-full max-w-[290px] rounded-[3rem] border border-black/8 bg-[#f5f5f7] p-3 shadow-device">
-          <div className="rounded-[2.5rem] border border-black/6 bg-white px-4 pb-4 pt-3">
-            <div className="mx-auto mb-4 h-1.5 w-20 rounded-full bg-black/10" />
-            <div className="rounded-[2rem] bg-[linear-gradient(180deg,#f7f8fb_0%,#eef2f6_100%)] p-5">
-              <div className="text-[0.65rem] uppercase tracking-[0.2em] text-mist">
-                Desafio da Atenção
-              </div>
-              <div className="mt-4 font-serif text-3xl leading-none tracking-[-0.05em] text-ink">
-                Atenção
-              </div>
-              <div className="relative mt-6 overflow-hidden rounded-[1.5rem] bg-white/72 p-4 ring-1 ring-black/5">
-                <div className="absolute inset-x-4 top-3 h-12 rounded-full bg-[radial-gradient(circle_at_center,rgba(163,177,194,0.18),transparent_72%)] blur-2xl" />
-                <div className="relative space-y-3 text-[0.78rem] uppercase tracking-[0.18em] text-mist">
-                  <div className="rounded-[1rem] bg-white/78 px-3 py-2 shadow-[0_10px_30px_rgba(15,23,42,0.05)] ring-1 ring-black/5">
-                    <span className="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-ink px-2 text-[0.72rem] font-semibold tracking-normal text-white">
-                      7
-                    </span>
-                    dias de preparação
-                  </div>
-                  <div className="rounded-[1rem] bg-white/78 px-3 py-2 shadow-[0_10px_30px_rgba(15,23,42,0.05)] ring-1 ring-black/5">
-                    <span className="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-ink px-2 text-[0.72rem] font-semibold tracking-normal text-white">
-                      7
-                    </span>
-                    dias de Desafio
-                  </div>
-                  <div className="rounded-[1rem] bg-white/78 px-3 py-2 shadow-[0_10px_30px_rgba(15,23,42,0.05)] ring-1 ring-black/5">
-                    <span className="mr-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-ink px-2 text-[0.72rem] font-semibold tracking-normal text-white">
-                      1
-                    </span>
-                    Possibilidade de mudança para Vida toda
-                  </div>
-                </div>
-              </div>
-              <div className="mt-8 rounded-[1.5rem] bg-white/85 p-4 shadow-float">
-                <div className="text-xs uppercase tracking-[0.18em] text-mist">
-                  progresso
-                </div>
-                <div className="mt-3 flex gap-2">
-                  {Array.from({ length: 7 }).map((_, index) => (
-                    <span
-                      key={index}
-                      className={`h-1.5 flex-1 rounded-full ${index < 4 ? "bg-ink" : "bg-black/10"}`}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="rounded-[2.5rem] bg-[linear-gradient(180deg,#fbfbfd_0%,#f3f5f8_100%)] p-3 shadow-panel ring-1 ring-black/6">
-          <div className="rounded-[2.1rem] bg-white/88 p-5 ring-1 ring-black/5 md:p-7">
-            <div className="space-y-4">
-              <div className="rounded-[1.8rem] bg-[linear-gradient(180deg,#f7f8fa_0%,#eef2f6_100%)] p-6">
-                <div className="text-[0.68rem] uppercase tracking-[0.22em] text-mist">
-                  o que pode estar travando sua vida
-                </div>
-                <div className="mt-5 font-serif text-4xl leading-[0.96] tracking-[-0.06em] text-ink md:text-5xl">
-                  Não é falta de Disciplina.
-                </div>
-                <p className="mt-4 max-w-sm text-sm leading-6 text-mist md:text-base">
-                  É sua atenção sendo roubada, fragmentada em dezenas de pequenas promessas diárias que você nem vê chegar: abas abertas, notificações, urgências artificiais e a sensação constante de estar ocupado sem sair do lugar.
-                </p>
-              </div>
-
-              <div className="rounded-[1.5rem] bg-[#f7f8fb] p-5">
-                <div className="space-y-4 text-base leading-7 text-ink md:text-lg">
-                  <p className="font-semibold">É você priorizando distrações e deixando as pessoas mais importantes da sua vida em segundo plano.</p>
-                  <p>Você abre o celular sem perceber.</p>
-                  <p>Trabalha o dia todo e encerra com a mente exausta.</p>
-                  <p>Tem dificuldade para entrar no trabalho que exige presença.</p>
-                  <p>Procura alívio em telas, mas recebe mais ruído.</p>
-                  <p>Sente que perdeu o ritmo, mas não sabe como voltar.</p>
-                </div>
-              </div>
-              <p className="text-center text-sm leading-6 text-mist md:text-base">
-                Se isso parece familiar, o desafio foi desenhado para você.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function StructureCard({
-  item,
-  index
-}: {
-  item: (typeof structureItems)[number];
-  index: number;
-}) {
-  return (
-    <motion.article
-      className="rounded-[2.5rem] bg-[linear-gradient(180deg,#fafbfd_0%,#f4f6f8_100%)] p-8 ring-1 ring-black/5 md:p-10"
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, amount: 0.28 }}
-      custom={index * 0.05}
-      variants={fadeUp}
-    >
-      <div className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slateSoft">
-        {item.eyebrow}
-      </div>
-      <div className="mt-5 text-sm text-mist">{item.index}</div>
-      <h3 className="mt-2 max-w-[12ch] font-serif text-4xl leading-[0.98] tracking-[-0.05em] text-ink md:text-5xl">
-        {item.title}
-      </h3>
-      <p className="mt-5 max-w-[32rem] text-base leading-7 text-mist md:text-lg">
-        {item.description}
-      </p>
-    </motion.article>
   );
 }
 
@@ -359,562 +383,520 @@ function FaqItem({
 }) {
   return (
     <motion.article
-      className="rounded-[2rem] bg-[#f7f8fa] p-6 ring-1 ring-black/5 md:p-7"
+      className="rounded-[2rem] border border-black/6 bg-white/74 p-6 shadow-[0_18px_50px_rgba(16,17,20,0.05)] backdrop-blur-xl md:p-7"
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount: 0.25 }}
-      custom={index * 0.05}
+      viewport={{ once: true, amount: 0.2 }}
+      custom={index * 0.04}
       variants={fadeUp}
     >
-      <h3 className="text-xl font-medium tracking-[-0.03em] text-ink md:text-2xl">
-        {question}
-      </h3>
-      <p className="mt-3 max-w-3xl text-base leading-7 text-mist">{answer}</p>
+      <h3 className="text-xl font-medium tracking-[-0.03em] text-[#121417] md:text-2xl">{question}</h3>
+      <p className="mt-3 max-w-3xl text-base leading-7 text-[#66707c]">{answer}</p>
     </motion.article>
   );
 }
 
 export function LandingPage() {
   return (
-    <main className="relative overflow-x-clip bg-white text-ink">
-      <header className="sticky top-0 z-50 border-b border-black/6 bg-white/78 backdrop-blur-2xl">
-        <div className="mx-auto flex h-12 w-full max-w-[1200px] items-center justify-between px-5 sm:px-8">
-          <span className="text-sm font-medium tracking-[-0.01em] text-ink">Vitor Tyso</span>
-          <a
-            href={waitlistConfig.link}
-            className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-ink transition hover:bg-black/[0.035]"
-          >
-            {waitlistConfig.ctaLabel}
-          </a>
+    <main className="bg-[#f7f7f3] text-[#111318]">
+      <div className="relative overflow-hidden border-b border-black/6 bg-[linear-gradient(180deg,#fbfbf8_0%,#f6f7f4_54%,#f2f4f1_100%)]">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(163,179,202,0.34),transparent_24%),radial-gradient(circle_at_78%_18%,rgba(209,193,154,0.12),transparent_16%),radial-gradient(circle_at_24%_75%,rgba(150,170,194,0.26),transparent_20%),linear-gradient(180deg,rgba(255,255,255,0.76),rgba(255,255,255,0.16))]" />
+          <NeuralField />
+          <div className="grain-layer absolute inset-0 opacity-18" />
         </div>
-      </header>
+        <HeroDepthObjects />
 
-      <div className="mx-auto w-full max-w-[1320px] px-5 sm:px-8">
-        <section className="flex min-h-[calc(100vh-3rem)] items-center py-20 md:py-28">
-          <div className="w-full">
-            <motion.div
-              className="mx-auto max-w-[1020px] text-center"
-              initial="hidden"
-              animate="visible"
-              variants={fadeUp}
-            >
-              <p className="text-[0.8rem] font-semibold uppercase tracking-[0.24em] text-slateSoft">
-                Desafio da Atenção
-              </p>
-              <h1 className="mt-5 text-balance font-serif text-[4.2rem] leading-[0.9] tracking-[-0.075em] text-ink sm:text-[5.8rem] md:text-[7.4rem] lg:text-[8.8rem]">
-                Saia do automático - antes que a vida passe sem você.
-              </h1>
-              <p className="mx-auto mt-6 max-w-3xl text-balance text-base leading-7 text-mist md:text-xl md:leading-8">
-                Um protocolo de 14 dias para proteger o que está sendo roubado de você todos os dias - e voltar a sentir que sua vida está andando.
-              </p>
-              <p className="mx-auto mt-4 max-w-3xl text-balance text-sm font-semibold italic leading-7 text-[#7c322e] md:text-lg">
-                O ambiente foi projetado para roubar sua atenção. Você estava lutando sem saber que tinha um inimigo.
-              </p>
-              <p className="mx-auto mt-4 max-w-2xl text-balance text-base leading-7 text-ink/80 md:text-lg">
-                A proposta é simples: foco, clareza e presença ao longo de 14 dias.
-              </p>
-              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <a
-                  href={waitlistConfig.link}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-white transition hover:bg-black/88"
-                >
-                  {waitlistConfig.ctaLabel}
-                </a>
-                <a
-                  href={waitlistConfig.link}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full px-6 text-sm font-medium text-ink transition hover:bg-black/[0.03]"
-                >
-                  {waitlistConfig.ctaLabel}
-                </a>
-              </div>
-
-              <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-2 rounded-full bg-[#f5f5f7] px-5 py-3 text-sm text-mist ring-1 ring-black/5">
-                <span className="font-medium text-ink">Grupo Fechado</span>
-                <span>•</span>
-                <span>Vagas Limitadas</span>
-              </div>
-            </motion.div>
-
-            <DeviceMockup />
+        <header className="relative z-10 border-b border-black/6 bg-white/52 backdrop-blur-2xl">
+          <div className="mx-auto flex h-14 w-full max-w-[1240px] items-center justify-between px-5 sm:px-8">
+            <div className="text-sm font-medium tracking-[-0.01em] text-[#111318]">Vitor Tyso</div>
+            <PrimaryCta />
           </div>
-        </section>
+        </header>
 
-        <section className="py-20 md:py-28">
-          <SectionHeader
-            eyebrow="O que está custando?"
-            title="O preço da atenção fragmentada não aparece na fatura."
-            subtitle="Ele aparece como cansaço mental, microadiamentos, culpa e a percepção incômoda de que a vida está sendo empurrada no automático."
-            align="left"
-          />
-
-          <div className="mt-8 max-w-3xl space-y-4 text-lg leading-8 text-mist md:text-[1.4rem] md:leading-[1.65]">
-            <p>Você tenta se organizar.</p>
-            <p>Mas sua mente já começa o dia carregada.</p>
-            <p>Muitas abas abertas.</p>
-            <p>Muitas ideias competindo.</p>
-            <p>Muito conteúdo entrando.</p>
-            <p>Pouca energia sobrando para decidir e concluir.</p>
-          </div>
-
-          <div className="mt-14 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {painCards.map((card, index) => (
-              <motion.article
-                key={card.title}
-                className="rounded-[2.2rem] bg-[#f7f8fa] p-6 ring-1 ring-black/5 md:p-7"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.25 }}
-                custom={index * 0.05}
-                variants={fadeUp}
-              >
-                <h3 className="text-2xl font-medium tracking-[-0.03em] text-ink">
-                  {card.title}
-                </h3>
-                <p className="mt-4 text-base leading-7 text-mist">{card.description}</p>
-              </motion.article>
-            ))}
-          </div>
-        </section>
-
-        <section className="py-10 md:py-16">
+        <section className="relative z-10 mx-auto max-w-[1240px] px-5 py-20 sm:px-8 md:py-28">
           <motion.div
-            className="rounded-[2.75rem] bg-[#f5f5f7] px-6 py-14 ring-1 ring-black/5 md:px-12 md:py-18"
+            className="mx-auto max-w-[980px] text-center"
             initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.35 }}
-            variants={fadeUp}
-            >
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slateSoft">
-              Agitação
-            </p>
-            <h2 className="mt-4 max-w-4xl font-serif text-[2.9rem] leading-[0.96] tracking-[-0.055em] text-ink sm:text-[4rem] md:text-[5rem]">
-              A atenção fragmentada cobra um preço silencioso.
-            </h2>
-            <div className="mt-6 max-w-4xl space-y-4 text-lg leading-8 text-mist md:text-[1.45rem] md:leading-[1.6]">
-              <p>Você demora mais para decidir.</p>
-              <p>Gasta energia demais no que não importa.</p>
-              <p>Adia o que sabe que precisa enfrentar.</p>
-              <p>Sente ansiedade mental mesmo quando está parado.</p>
-              <p>E, aos poucos, perde a sensação de direção.</p>
-            </div>
-            <div className="mt-8 space-y-3">
-              <p className="text-xl font-medium tracking-[-0.03em] text-ink">Não porque você seja incapaz.</p>
-              <p className="max-w-3xl text-lg leading-8 text-mist">
-                Mas porque ninguém sustenta clareza por muito tempo em estado contínuo de sobrecarga.
-              </p>
-            </div>
-          </motion.div>
-        </section>
-
-        <section className="py-10 md:py-14">
-          <motion.div
-            className="mx-auto max-w-4xl border-y border-black/6 px-6 py-10 text-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.4 }}
+            animate="visible"
             variants={fadeUp}
           >
-            <p className="text-lg font-medium tracking-[-0.03em] text-ink">
-              Você não precisa continuar assim.
+            <p className="text-[0.74rem] font-semibold uppercase tracking-[0.24em] text-[#8b94a1]">
+              Desafio da Atenção — Vitor Tyso
             </p>
-            <div className="mt-5">
-              <a
-                href={waitlistConfig.link}
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-white transition hover:bg-black/88"
-              >
-                {waitlistConfig.ctaLabel}
-              </a>
+            <h1 className="mt-5 text-balance font-serif text-[3.5rem] leading-[0.9] tracking-[-0.08em] text-[#111318] sm:text-[4.8rem] md:text-[6.2rem] lg:text-[7rem]">
+              Sua atenção está sendo roubada.
+              <br />
+              E você está pagando com a sua vida.
+            </h1>
+            <p className="mx-auto mt-6 max-w-3xl text-balance text-base leading-7 text-[#66707c] md:text-xl md:leading-8">
+              Um protocolo de 14 dias para recuperar clareza mental, presença e direção em um ambiente construído para fragmentar sua mente.
+            </p>
+            <div className="mt-10">
+              <PrimaryCta />
             </div>
-            <p className="mt-4 text-sm leading-6 text-mist">
-              Garantia de 7 dias. Sem questionamento.
-            </p>
-          </motion.div>
-        </section>
-
-        <section id="mecanismo" className="py-20 md:py-28">
-          <motion.div
-            className="mx-auto max-w-4xl text-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.45 }}
-            variants={fadeUp}
-          >
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slateSoft">
-              Solução
-            </p>
-            <div className="mt-4 rounded-[2.4rem] bg-[linear-gradient(180deg,rgba(251,251,253,0.96)_0%,rgba(243,245,248,0.92)_100%)] px-6 py-8 shadow-[0_28px_80px_rgba(15,23,42,0.06)] ring-1 ring-black/5 md:px-10 md:py-10">
-              <h2 className="bg-[linear-gradient(180deg,#0f172a_0%,#3f4958_100%)] bg-clip-text text-balance font-serif text-[2.9rem] leading-[0.96] tracking-[-0.055em] text-transparent sm:text-[4rem] md:text-[5.2rem]">
-                Não é mais um curso de produtividade. É a proteção contra um ambiente programado para roubar sua atenção.
-              </h2>
-            </div>
-            <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-mist md:text-lg">
-              Atenção não é só um recurso mental escasso. É o capital invisível que molda a qualidade da sua vida.
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-[#8b94a1]">
+              {waitlistConfig.supportText}
             </p>
           </motion.div>
 
           <motion.div
-            className="mt-14 rounded-[2.75rem] bg-[linear-gradient(180deg,#fbfbfd_0%,#f3f5f8_100%)] p-6 ring-1 ring-black/5 md:p-8"
+            className="mx-auto mt-16 grid max-w-[1120px] gap-5 lg:grid-cols-[1.12fr_0.88fr]"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.25 }}
             variants={fadeUp}
           >
-            <div className="mx-auto max-w-4xl text-center">
-              <div className="space-y-4 text-lg leading-8 text-mist md:text-[1.2rem] md:leading-[1.75]">
-                <p>O desafio foi desenhado para restaurar a base mental. Em vez de ensinar hacks para render mais, ele reorganiza o terreno onde a sua atenção pisa.</p>
-                <p>Você não vai encontrar promessas de rotina perfeita. Vai receber uma sequência de intervenções curtas, objetivas e práticas para reduzir ruído, aumentar presença e voltar a terminar o que importa.</p>
+            <div className="rounded-[2.5rem] border border-[rgba(134,149,170,0.18)] bg-white/54 p-6 shadow-[0_24px_80px_rgba(16,17,20,0.08)] backdrop-blur-2xl">
+              <div className="rounded-[2rem] border border-[rgba(134,149,170,0.16)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82)_0%,rgba(241,245,248,0.62)_100%)] p-6 md:p-8">
+                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
+                  A grande tese
+                </p>
+                <p className="mt-4 max-w-2xl text-balance font-serif text-[2rem] leading-[1.02] tracking-[-0.05em] text-[#111318] md:text-[3rem]">
+                  Talvez você não esteja perdido. Talvez exista ruído demais.
+                </p>
+                <div className="mt-8 grid gap-3 md:grid-cols-3">
+                  {["feed", "notificações", "urgências"].map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-[1.4rem] border border-[rgba(134,149,170,0.16)] bg-white/72 px-4 py-4 text-sm uppercase tracking-[0.2em] text-[#66707c]"
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[2.5rem] border border-[rgba(134,149,170,0.18)] bg-[linear-gradient(180deg,rgba(255,255,255,0.76)_0%,rgba(241,245,248,0.62)_100%)] p-5 shadow-[0_24px_80px_rgba(16,17,20,0.08)] backdrop-blur-2xl">
+              <div className="flex h-full flex-col rounded-[2rem] border border-[rgba(134,149,170,0.16)] bg-white/58 p-6">
+                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
+                  Sinal mais comum
+                </div>
+                <div className="mt-5 font-serif text-4xl leading-[0.94] tracking-[-0.06em] text-[#111318]">
+                  Vida cheia. Presença baixa.
+                </div>
+                <p className="mt-4 text-base leading-7 text-[#66707c]">
+                  Você abre o celular sem perceber, consome muito, aplica pouco e sente os dias passando mais rápido do que gostaria.
+                </p>
+                <div className="mt-8 space-y-3">
+                  {[72, 54, 88, 41].map((value, index) => (
+                    <div key={index}>
+                      <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.22em] text-[#8b94a1]">
+                        <span>{["ruído", "presença", "continuidade", "clareza"][index]}</span>
+                        <span>{value}%</span>
+                      </div>
+                      <div className="h-2 rounded-full bg-black/8">
+                        <div
+                          className="h-2 rounded-full bg-[linear-gradient(90deg,#d7dde7_0%,#92a4bf_100%)]"
+                          style={{ width: `${value}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </motion.div>
         </section>
+      </div>
 
-        <section id="estrutura" className="py-20 md:py-28">
-          <SectionHeader
-            eyebrow="Estrutura do desafio"
-            title="7 Etapas para reorganizar sua Atenção"
-            subtitle=""
+      <section className="px-5 py-20 sm:px-8 md:py-28">
+        <div className="mx-auto max-w-[1240px]">
+          <SectionIntro
+            eyebrow="Identificação imediata"
+            title="Sinais de que sua atenção está sendo consumida"
+            subtitle="Você não precisa ler muito para saber se isso te descreve."
           />
 
-          <div className="mt-14 space-y-5 md:space-y-6">
-            {structureItems.map((item, index) => (
-              <StructureCard key={item.index} item={item} index={index} />
+          <div className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {symptomCards.map((item, index) => (
+              <motion.article
+                key={item}
+                className="group rounded-[2rem] border border-black/6 bg-white/78 p-6 shadow-[0_18px_50px_rgba(16,17,20,0.05)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_24px_65px_rgba(16,17,20,0.08)]"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.22 }}
+                custom={index * 0.04}
+                variants={fadeUp}
+              >
+                <div className="mb-5 h-9 w-9 rounded-full border border-black/6 bg-[#eff3f8] p-2">
+                  <div className="h-full w-full rounded-full bg-[#8ba0bd]" />
+                </div>
+                <p className="text-lg leading-7 tracking-[-0.02em] text-[#111318]">{item}</p>
+              </motion.article>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="py-20 md:py-28">
-          <SectionHeader
-            eyebrow="Transformação"
-            title="O que começa a mudar quando sua atenção volta para o lugar."
-            subtitle=""
+      <section className="px-5 py-20 sm:px-8 md:py-28">
+        <div className="mx-auto max-w-[1240px]">
+          <SectionIntro
+            eyebrow="A grande tese"
+            title="A atenção é o recurso mais valioso da sua vida."
+            subtitle="Quanto mais ruído, menos critério. Quanto menos critério, mais difícil fica sustentar direção."
           />
 
           <div className="mt-14 grid gap-5 lg:grid-cols-3">
-            {transformationPanels.map((panel, index) => (
+            {thesisStatements.map((statement, index) => (
               <motion.article
-                key={panel.title}
-                className="rounded-[2.4rem] bg-[linear-gradient(180deg,#fafbfd_0%,#f3f5f8_100%)] p-8 ring-1 ring-black/5 md:min-h-[320px] md:p-10"
+                key={statement}
+                className="rounded-[2.3rem] border border-black/6 bg-white/72 p-8 shadow-[0_24px_70px_rgba(16,17,20,0.05)] backdrop-blur-xl"
                 initial="hidden"
                 whileInView="visible"
-                viewport={{ once: true, amount: 0.3 }}
+                viewport={{ once: true, amount: 0.25 }}
                 custom={index * 0.06}
                 variants={fadeUp}
               >
-                <h3 className="font-serif text-4xl leading-none tracking-[-0.05em] text-ink md:text-5xl">
-                  {panel.title}
-                </h3>
-                <p className="mt-5 max-w-sm text-base leading-7 text-mist md:text-lg">
-                  {panel.description}
+                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
+                  0{index + 1}
+                </div>
+                <p className="mt-5 font-serif text-[2rem] leading-[1.04] tracking-[-0.045em] text-[#111318] md:text-[2.5rem]">
+                  {statement}
                 </p>
               </motion.article>
             ))}
           </div>
+        </div>
+      </section>
 
-          <div className="mt-8 grid gap-4 lg:grid-cols-3">
-            {beforeAfterItems.map((item, index) => (
+      <section className="px-5 py-20 sm:px-8 md:py-28">
+        <div className="mx-auto grid max-w-[1240px] gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeUp}
+          >
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#8b94a1]">
+              Analogia do ruído
+            </p>
+            <h2 className="mt-4 text-balance font-serif text-[2.8rem] leading-[0.96] tracking-[-0.06em] text-[#111318] sm:text-[3.8rem] md:text-[5rem]">
+              Quando procuramos um endereço, instintivamente abaixamos o volume do carro.
+            </h2>
+            <div className="mt-6 space-y-4 text-lg leading-8 text-[#66707c] md:text-[1.32rem] md:leading-[1.65]">
+              <p>Mas quando tentamos encontrar direção na vida, fazemos o contrário.</p>
+              <p>Aumentamos o feed, o ruído, as distrações e os estímulos.</p>
+              <p className="font-medium text-[#111318]">
+                Talvez o problema não seja falta de direção. Talvez exista ruído demais.
+              </p>
+            </div>
+            <div className="mt-8">
+              <PrimaryCta />
+            </div>
+          </motion.div>
+
+          <motion.div
+            className="rounded-[2.5rem] border border-black/6 bg-[linear-gradient(180deg,#fafbfd_0%,#eef2f6_100%)] p-5 shadow-[0_28px_90px_rgba(16,17,20,0.08)]"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            variants={fadeUp}
+          >
+            <div className="overflow-hidden rounded-[2rem] border border-black/6 bg-[radial-gradient(circle_at_top,rgba(171,190,214,0.32),transparent_35%),linear-gradient(180deg,#f9fafb_0%,#edf2f6_100%)] p-6">
+              <div className="flex items-center justify-between text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
+                <span>direção noturna</span>
+                <span>silêncio e leitura</span>
+              </div>
+              <div className="mt-10 rounded-[1.8rem] border border-black/6 bg-white/64 p-6 backdrop-blur-xl">
+                <div className="flex items-end gap-2">
+                  {[90, 72, 58, 36, 18].map((value, index) => (
+                    <div key={index} className="flex-1 rounded-full bg-black/[0.04] p-1">
+                      <div
+                        className="rounded-full bg-[linear-gradient(180deg,#d8e0eb_0%,#8ca0bd_100%)]"
+                        style={{ height: `${value}px` }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-[1.4rem] border border-black/6 bg-white/66 p-4">
+                    <div className="text-[0.64rem] uppercase tracking-[0.22em] text-[#8b94a1]">
+                      antes
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-[#66707c]">
+                      volume alto, atenção disputada, direção embaralhada
+                    </p>
+                  </div>
+                  <div className="rounded-[1.4rem] border border-black/6 bg-white/66 p-4">
+                    <div className="text-[0.64rem] uppercase tracking-[0.22em] text-[#8b94a1]">
+                      depois
+                    </div>
+                    <p className="mt-2 text-sm leading-6 text-[#66707c]">
+                      menos ruído, mais presença, leitura mais nítida do que importa
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="px-5 py-20 sm:px-8 md:py-28">
+        <div className="mx-auto max-w-[1240px]">
+          <SectionIntro
+            eyebrow="O que é o desafio"
+            title="Duas semanas para perceber o ruído, reduzir a captura e reconstruir direção."
+            subtitle="Menos texto. Mais entendimento do que vai acontecer com você ao longo do processo."
+          />
+
+          <div className="mt-14 grid gap-5 lg:grid-cols-2">
+            {weekBlocks.map((week, index) => (
               <motion.article
-                key={item.before}
-                className="rounded-[2.2rem] bg-[#f7f8fa] p-6 ring-1 ring-black/5 md:p-7"
+                key={week.label}
+                className="rounded-[2.5rem] border border-black/6 bg-white/76 p-8 shadow-[0_20px_55px_rgba(16,17,20,0.05)] backdrop-blur-xl md:p-10"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, amount: 0.25 }}
                 custom={index * 0.05}
                 variants={fadeUp}
               >
-                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slateSoft">
-                  Antes
+                <div className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#8b94a1]">
+                  {week.label}
                 </div>
-                <p className="mt-3 text-lg leading-7 text-mist">{item.before}</p>
-                <div className="mt-6 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-slateSoft">
-                  Depois
+                <h3 className="mt-4 font-serif text-[2.2rem] leading-[0.98] tracking-[-0.05em] text-[#111318] md:text-[3rem]">
+                  {week.title}
+                </h3>
+                <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                  {week.items.map((item) => (
+                    <div
+                      key={item}
+                      className="rounded-[1.4rem] border border-black/6 bg-[#f4f7fb] px-4 py-4 text-sm font-medium uppercase tracking-[0.18em] text-[#67717d]"
+                    >
+                      {item}
+                    </div>
+                  ))}
                 </div>
-                <p className="mt-3 text-lg leading-7 text-ink">{item.after}</p>
               </motion.article>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="py-20 md:py-28">
-          <motion.div
-            className="mx-auto grid max-w-5xl gap-10 md:grid-cols-[minmax(240px,320px)_1fr] md:items-center md:text-left"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.45 }}
-            variants={fadeUp}
-          >
-            <div className="mx-auto w-full max-w-[280px]">
-              <div className="overflow-hidden rounded-[2.2rem] bg-[linear-gradient(180deg,#fafbfd_0%,#f4f6f8_100%)] p-3 shadow-[0_28px_80px_rgba(15,23,42,0.08)] ring-1 ring-black/5">
-                <div className="overflow-hidden rounded-[1.75rem] bg-white">
-                  <Image
-                    src="/vitor-tyso-autor.jpeg"
-                    alt="Retrato de Vitor Tyso"
-                    width={768}
-                    height={1024}
-                    className="h-auto w-full scale-[1.08] object-cover object-center"
-                    priority
-                  />
+      <section className="px-5 py-20 sm:px-8 md:py-28">
+        <div className="mx-auto max-w-[1240px]">
+          <SectionIntro
+            eyebrow="Transformação"
+            title="Antes: mente fragmentada. Depois: presença, clareza e sensação de retomada."
+            subtitle="Não se trata de virar outra pessoa. Se trata de parar de entregar sua vida para o excesso de estímulos."
+          />
+
+          <div className="mt-14 grid gap-5 lg:grid-cols-3">
+            {beforeAfterItems.map((item, index) => (
+              <motion.article
+                key={item.before}
+                className="rounded-[2.3rem] border border-black/6 bg-white/76 p-7 shadow-[0_18px_50px_rgba(16,17,20,0.05)] backdrop-blur-xl md:p-8"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.25 }}
+                custom={index * 0.05}
+                variants={fadeUp}
+              >
+                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
+                  antes
                 </div>
-              </div>
-            </div>
-
-            <div className="text-center md:text-left">
-              <h2 className="font-serif text-[2.9rem] leading-[0.98] tracking-[-0.055em] text-ink sm:text-[4rem] md:text-[5rem]">
-                Criado por Vitor Tyso
-              </h2>
-              <div className="mt-6 space-y-4">
-                {authorStoryParagraphs.map((paragraph) => (
-                  <p
-                    key={paragraph}
-                    className={`mx-auto max-w-3xl text-balance text-base leading-7 md:mx-0 md:text-lg ${
-                      paragraph === "Eu estava acordado de corpo. Morto por dentro."
-                        ? "font-semibold text-[#7c322e]"
-                        : "text-mist"
-                    }`}
-                  >
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        </section>
-
-        <section className="py-10 md:py-16">
-          <motion.div
-            className="grid gap-8 rounded-[2.75rem] bg-[#f5f5f7] px-6 py-8 ring-1 ring-black/5 md:grid-cols-[220px_1fr] md:items-center md:px-10 md:py-10"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.35 }}
-            variants={fadeUp}
-          >
-            <div className="mx-auto flex h-[170px] w-[170px] items-center justify-center rounded-full bg-white shadow-float ring-1 ring-[#cfd6df] md:h-[180px] md:w-[180px]">
-              <div className="relative flex h-[138px] w-[138px] items-center justify-center rounded-full border border-[#cfd6df]">
-                <div className="absolute inset-[14px] rounded-full border border-dashed border-[#c8d0da]" />
-                <div className="text-center">
-                  <div className="text-6xl font-semibold tracking-[-0.06em] text-ink">7</div>
-                  <div className="mt-1 text-[0.62rem] uppercase tracking-[0.22em] text-slateSoft">
-                    dias
-                  </div>
+                <p className="mt-3 text-lg leading-7 text-[#66707c]">{item.before}</p>
+                <div className="mt-8 text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
+                  depois
                 </div>
-              </div>
-            </div>
-
-            <div>
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slateSoft">
-                Garantia
-              </p>
-              <h2 className="mt-3 font-serif text-[2.5rem] leading-[0.98] tracking-[-0.055em] text-ink sm:text-[3.3rem] md:text-[4.2rem]">
-                Teste com segurança por 7 dias.
-              </h2>
-              <p className="mt-5 max-w-4xl text-balance text-lg leading-8 text-mist md:text-[1.45rem] md:leading-[1.6]">
-                Se ao iniciar o desafio você perceber que ele não faz sentido para o seu momento, pode solicitar cancelamento dentro de 7 dias.
-              </p>
-              <p className="mt-3 max-w-4xl text-balance text-lg leading-8 text-mist md:text-[1.2rem] md:leading-[1.6]">
-                A proposta é simples: reduzir risco para que você possa entrar com tranquilidade.
-              </p>
-            </div>
-          </motion.div>
-        </section>
-
-        <section id="oferta" className="py-20 md:py-28">
-          <div className="rounded-[2.75rem] bg-[#f5f5f7] px-6 py-14 md:px-12 md:py-20">
-            <motion.div
-              className="mx-auto max-w-5xl text-center"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, amount: 0.35 }}
-              variants={fadeUp}
-            >
-              <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slateSoft">
-                Oferta
-              </p>
-              <h2 className="mt-4 font-serif text-[2.9rem] leading-[0.96] tracking-[-0.055em] text-ink sm:text-[4rem] md:text-[5rem]">
-                Comece a recuperar sua atenção hoje.
-              </h2>
-              <p className="mx-auto mt-5 max-w-2xl text-balance text-base leading-7 text-mist md:text-lg">
-                Acesso ao Desafio da Atenção por {landingConfig.price}.
-              </p>
-
-              <div className="mt-10 font-serif text-[3.8rem] leading-none tracking-[-0.06em] text-ink sm:text-[4.8rem] md:text-[6.2rem]">
-                {landingConfig.price}
-              </div>
-              <p className="mx-auto mt-4 max-w-2xl text-balance text-base leading-7 text-mist md:text-lg">
-                12 x de 19,70
-              </p>
-
-              <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {offerHighlights.map((item) => (
-                  <div
-                    key={item}
-                    className="rounded-[1.6rem] bg-white/78 px-5 py-5 text-sm text-mist ring-1 ring-black/5"
-                  >
-                    {item}
-                  </div>
-                ))}
-              </div>
-
-              <p className="mx-auto mt-6 max-w-2xl text-balance text-base leading-7 text-mist md:text-lg">
-                Não é mais conteúdo para acumular.
-              </p>
-              <p className="mx-auto mt-2 max-w-2xl text-balance text-base leading-7 text-mist md:text-lg">
-                É uma estrutura para ajudar você a voltar a pensar e agir com mais clareza.
-              </p>
-
-              <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <a
-                  href={waitlistConfig.link}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-white transition hover:bg-black/88"
-                >
-                  {waitlistConfig.ctaLabel}
-                </a>
-              </div>
-            </motion.div>
+                <p className="mt-3 text-lg leading-7 text-[#111318]">{item.after}</p>
+              </motion.article>
+            ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="py-20 md:py-28">
+      <section className="px-5 py-20 sm:px-8 md:py-28">
+        <div className="mx-auto max-w-[1240px]">
+          <SectionIntro
+            eyebrow="Base real"
+            title="Antes de ser ensinado, foi testado na prática."
+            subtitle="Ainda sem depoimentos públicos da primeira turma. Por honestidade, a prova nesta página começa pelos resultados que deram origem ao protocolo."
+          />
+
+          <div className="mt-14 grid gap-5 md:grid-cols-3">
+            {proofCards.map((card, index) => (
+              <motion.article
+                key={card.eyebrow}
+                className="rounded-[2.3rem] border border-black/6 bg-white/78 p-7 shadow-[0_18px_50px_rgba(16,17,20,0.05)] backdrop-blur-xl"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, amount: 0.25 }}
+                custom={index * 0.05}
+                variants={fadeUp}
+              >
+                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
+                  {card.eyebrow}
+                </div>
+                <div className="mt-5 font-serif text-[3rem] leading-none tracking-[-0.06em] text-[#111318]">
+                  {card.value}
+                </div>
+                <p className="mt-4 text-base leading-7 text-[#66707c]">{card.detail}</p>
+              </motion.article>
+            ))}
+          </div>
+
           <motion.div
-            className="rounded-[2.75rem] bg-[#f5f5f7] px-6 py-14 text-center ring-1 ring-black/5 md:px-12 md:py-16"
+            className="mx-auto mt-8 max-w-4xl rounded-[2.3rem] border border-[#b8c6d9] bg-[linear-gradient(180deg,rgba(230,236,243,0.72)_0%,rgba(255,255,255,0.82)_100%)] p-8 text-center shadow-[0_18px_50px_rgba(16,17,20,0.04)]"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            variants={fadeUp}
+          >
+            <p className="text-lg leading-8 text-[#66707c] md:text-[1.2rem] md:leading-[1.75]">
+              O desafio nasceu de uma hipótese pessoal: quando a atenção volta para o lugar, a vida volta a andar. A primeira turma entra em seguida. Os relatos públicos entram aqui à medida que forem acontecendo.
+            </p>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="px-5 py-20 sm:px-8 md:py-28">
+        <div className="mx-auto grid max-w-[1240px] gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+          <motion.div
+            className="mx-auto w-full max-w-[320px]"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.35 }}
             variants={fadeUp}
           >
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-slateSoft">
-              Prova pessoal
-            </p>
-            <h2 className="mt-4 font-serif text-[2.9rem] leading-[0.96] tracking-[-0.055em] text-ink sm:text-[4rem] md:text-[4.8rem]">
-              Testado antes de ser ensinado.
-            </h2>
-            <p className="mx-auto mt-6 max-w-3xl text-balance text-lg leading-8 text-mist">
-              Antes de criar qualquer aula, apliquei esse protocolo em mim mesmo por 30 dias.
-            </p>
-            <p className="mx-auto mt-3 max-w-3xl text-balance text-lg leading-8 text-mist">
-              Sem contar calorias. Sem dieta especial. Apenas recuperando o controle da minha atenção.
-            </p>
-            <p className="mx-auto mt-3 max-w-3xl text-balance text-lg leading-8 text-mist">
-              Resultado: 8kg a menos na balança, meses sem álcool, silêncio mental recuperado, presença real com quem amo.
-            </p>
-            <p className="mx-auto mt-3 max-w-3xl text-balance text-lg leading-8 text-mist">
-              Mas o resultado mais importante foi esse: voltei a sentir que a minha vida estava andando.
-            </p>
+            <div className="overflow-hidden rounded-[2.4rem] border border-black/6 bg-white/76 p-3 shadow-[0_28px_90px_rgba(16,17,20,0.08)] backdrop-blur-xl">
+              <div className="overflow-hidden rounded-[2rem]">
+                <Image
+                  src="/vitor-tyso-autor-dark.jpeg"
+                  alt="Retrato de Vitor Tyso"
+                  width={768}
+                  height={1024}
+                  className="h-auto w-full object-cover object-center grayscale"
+                  priority
+                />
+              </div>
+            </div>
+          </motion.div>
 
-            <div className="mx-auto mt-8 max-w-xl rounded-[1.8rem] border border-[#7c322e]/30 bg-white/70 px-6 py-5 text-center shadow-[0_18px_50px_rgba(124,50,46,0.08)]">
-              <p className="text-lg font-medium tracking-[-0.03em] text-[#7c322e]">
-                IAT inicial: 4 | IAT após 30 dias: 17
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.35 }}
+            variants={fadeUp}
+          >
+            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#8b94a1]">
+              Criado por Vitor Tyso
+            </p>
+            <h2 className="mt-4 text-balance font-serif text-[2.8rem] leading-[0.96] tracking-[-0.06em] text-[#111318] sm:text-[3.9rem] md:text-[5rem]">
+              Um protocolo construído a partir de observação, excesso e reconstrução prática.
+            </h2>
+            <div className="mt-6 space-y-4 text-base leading-7 text-[#66707c] md:text-lg">
+              <p>Pesquisador independente sobre atenção, sobrecarga informacional e clareza mental.</p>
+              <p>
+                Depois de anos observando comportamento, decisão sob pressão e os efeitos do excesso sobre a execução, o trabalho deixou de ser apenas intelectual.
+              </p>
+              <p>
+                O Desafio da Atenção nasce de uma pergunta simples: o que muda quando você protege o que a vida moderna tenta capturar o tempo todo?
               </p>
             </div>
           </motion.div>
-        </section>
+        </div>
+      </section>
 
-        <section className="py-20 md:py-28">
-          <SectionHeader
-            eyebrow="Objeções"
-            title="Perguntas frequentes"
-            subtitle=""
+      <section className="px-5 py-20 sm:px-8 md:py-28">
+        <div className="mx-auto max-w-[1240px]">
+          <SectionIntro
+            eyebrow="Perguntas frequentes"
+            title="Clareza comercial sem pressão desnecessária."
+            subtitle="O próximo passo precisa parecer nítido antes de parecer urgente."
           />
 
           <div className="mt-14 grid gap-4">
             {faqItems.map((item, index) => (
-              <FaqItem
-                key={item.question}
-                question={item.question}
-                answer={item.answer}
-                index={index}
-              />
+              <FaqItem key={item.question} question={item.question} answer={item.answer} index={index} />
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="pb-28 pt-12 md:pb-36 md:pt-20">
-          <motion.div
-            className="mx-auto max-w-5xl text-center"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.45 }}
-            variants={fadeUp}
-          >
-            <h2 className="text-balance font-serif text-[3rem] leading-[0.95] tracking-[-0.06em] text-ink sm:text-[4.2rem] md:text-[5.4rem]">
-              O que está custando sua atenção pode estar custando mais do que você imagina.
-            </h2>
-            <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-mist md:text-xl md:leading-8">
-              Comece agora a reorganizar sua mente, seu ambiente e sua direção.
-            </p>
-            <div className="mt-8">
+      <section className="relative overflow-hidden px-5 py-20 sm:px-8 md:py-32">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(199,214,232,0.34),transparent_28%)]" />
+        <div className="grain-layer absolute inset-0 opacity-20" />
+        <motion.div
+          className="relative mx-auto max-w-5xl text-center"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.4 }}
+          variants={fadeUp}
+        >
+          <h2 className="text-balance font-serif text-[3rem] leading-[0.95] tracking-[-0.06em] text-[#111318] sm:text-[4.3rem] md:text-[5.6rem]">
+            Talvez recuperar sua atenção seja também recuperar sua vida.
+          </h2>
+          <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-[#66707c] md:text-xl md:leading-8">
+            Não é uma decisão sobre produtividade. É uma decisão sobre presença, direção e o tipo de vida que você ainda quer sentir acontecendo.
+          </p>
+          <div className="mt-8">
+            <PrimaryCta />
+          </div>
+        </motion.div>
+      </section>
+
+      <footer className="border-t border-black/6 bg-[#f5f6f2] px-5 py-10 sm:px-8 md:py-12">
+        <div className="mx-auto max-w-[1240px] rounded-[2.4rem] border border-black/6 bg-white/76 px-6 py-8 shadow-[0_18px_50px_rgba(16,17,20,0.05)] backdrop-blur-xl md:px-10 md:py-10">
+          <div className="grid gap-8 border-b border-black/6 pb-8 md:grid-cols-2">
+            <div>
+              <h3 className="text-2xl font-medium tracking-[-0.03em] text-[#111318]">Lista de espera</h3>
+              <p className="mt-3 max-w-xl text-lg leading-8 text-[#66707c]">
+                Entre para receber informações sobre a próxima turma e acompanhar os canais oficiais.
+              </p>
               <a
-                href={waitlistConfig.link}
-                className="inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-medium text-white transition hover:bg-black/88"
+                href={footerConfig.verifyLink}
+                className="mt-4 inline-flex text-lg leading-8 text-[#536b8f] transition hover:opacity-80"
               >
-                {waitlistConfig.ctaLabel}
+                Entrar na lista
               </a>
-            </div>
-          </motion.div>
-        </section>
-
-        <footer className="pb-16 pt-4 md:pb-20">
-          <div className="rounded-[2.5rem] bg-[#f7f8fa] px-6 py-8 ring-1 ring-black/5 md:px-10 md:py-10">
-            <div className="grid gap-8 border-b border-black/6 pb-8 md:grid-cols-2">
-              <div>
-                <h3 className="text-2xl font-medium tracking-[-0.03em] text-ink">
-                  Lista de espera
-                </h3>
-                <p className="mt-3 max-w-xl text-lg leading-8 text-mist">
-                  Clique para receber informações sobre a próxima turma e verificar os canais oficiais de contato.
-                </p>
+              <div className="mt-5 flex flex-col gap-2 text-base leading-7 text-[#66707c]">
                 <a
-                  href={footerConfig.verifyLink}
-                  className="mt-3 inline-flex text-lg leading-8 text-[#6d5ef3] transition hover:opacity-80"
+                  href={footerConfig.youtubeLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#536b8f] transition hover:opacity-80"
                 >
-                  Receber informações da próxima turma
+                  YouTube
                 </a>
-                <div className="mt-5 flex flex-col gap-2 text-base leading-7 text-mist">
-                  <a
-                    href={footerConfig.youtubeLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[#6d5ef3] transition hover:opacity-80"
-                  >
-                    YouTube
-                  </a>
-                  <span>Instagram em breve</span>
-                  <span>TikTok em breve</span>
-                  <a
-                    href={footerConfig.diagnosisLink}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-[#6d5ef3] transition hover:opacity-80"
-                  >
-                    Diagnóstico gratuito
-                  </a>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-2xl font-medium tracking-[-0.03em] text-ink">
-                  Aviso legal
-                </h3>
-                <p className="mt-3 text-lg leading-8 text-mist">
-                  O conteúdo deste desafio tem caráter educacional e informativo, com foco em atenção, sobrecarga mental e clareza.
-                </p>
-                <p className="mt-2 text-lg leading-8 text-mist">
-                  Não substitui acompanhamento médico, psicológico ou psiquiátrico, nem se propõe a diagnosticar, tratar ou curar condições de saúde.
-                </p>
+                <span>Instagram em breve</span>
+                <span>TikTok em breve</span>
+                <a
+                  href={footerConfig.diagnosisLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-[#536b8f] transition hover:opacity-80"
+                >
+                  Diagnóstico gratuito
+                </a>
               </div>
             </div>
 
-            <div className="mt-6 grid gap-4 text-base text-mist md:grid-cols-[1fr_auto_auto] md:items-start">
-              <div>
-                <span className="font-medium text-ink">© 2026 Vitor Tyso — Desafio da Atenção</span>
-                <div className="mt-2 text-sm italic text-[#7c322e]">Você vale mais.</div>
-              </div>
-              <a href={footerConfig.privacyLink} className="text-[#6d5ef3] transition hover:opacity-80">
-                Política de Privacidade
-              </a>
-              <div>{footerConfig.email}</div>
+            <div>
+              <h3 className="text-2xl font-medium tracking-[-0.03em] text-[#111318]">Aviso legal</h3>
+              <p className="mt-3 text-lg leading-8 text-[#66707c]">
+                O conteúdo deste desafio tem caráter educacional e informativo, com foco em atenção, sobrecarga mental e clareza.
+              </p>
+              <p className="mt-2 text-lg leading-8 text-[#66707c]">
+                Não substitui acompanhamento médico, psicológico ou psiquiátrico, nem se propõe a diagnosticar, tratar ou curar condições de saúde.
+              </p>
             </div>
           </div>
-        </footer>
-      </div>
+
+          <div className="mt-6 grid gap-4 text-base text-[#66707c] md:grid-cols-[1fr_auto_auto] md:items-start">
+            <div>
+              <span className="font-medium text-[#111318]">© 2026 Vitor Tyso — Desafio da Atenção</span>
+              <div className="mt-2 text-sm italic text-[#7c8ca2]">Você vale mais.</div>
+            </div>
+            <a href={footerConfig.privacyLink} className="text-[#536b8f] transition hover:opacity-80">
+              Política de Privacidade
+            </a>
+            <div>{footerConfig.email}</div>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
