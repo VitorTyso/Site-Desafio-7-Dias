@@ -2,7 +2,7 @@
 
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 const waitlistConfig = {
   ctaLabel: "Quero sair do automático",
@@ -18,15 +18,94 @@ const footerConfig = {
   diagnosisLink: "https://distra-o-digital.vercel.app"
 };
 
-const symptomCards = [
-  "Você pega o celular sem perceber",
-  "Consome muito e aplica pouco",
-  "Sua mente parece constantemente cansada",
-  "Tem dificuldade de presença",
-  "Sente os dias passando rápido",
-  "Começa coisas e abandona",
-  "Vive mentalmente fragmentado",
-  "Se sente perdido mesmo consumindo muito conteúdo"
+const iatQuestions = [
+  {
+    question: "Horas de tela hoje?",
+    options: [
+      { label: "Menos de 2h", points: 2 },
+      { label: "2-4h", points: 1 },
+      { label: "Mais de 4h", points: 0 }
+    ]
+  },
+  {
+    question: "Consumiu notícias?",
+    options: [
+      { label: "Não", points: 2 },
+      { label: "Sim brevemente", points: 1 },
+      { label: "Sim muito", points: 0 }
+    ]
+  },
+  {
+    question: "Minutos de foco profundo?",
+    options: [
+      { label: "Mais de 60min", points: 2 },
+      { label: "30-60min", points: 1 },
+      { label: "Menos de 30min", points: 0 }
+    ]
+  },
+  {
+    question: "Fez treino físico?",
+    options: [
+      { label: "Sim", points: 2 },
+      { label: "Parcial", points: 1 },
+      { label: "Não", points: 0 }
+    ]
+  },
+  {
+    question: "Meditação ou silêncio intencional?",
+    options: [
+      { label: "Sim", points: 2 },
+      { label: "Tentou", points: 1 },
+      { label: "Não", points: 0 }
+    ]
+  },
+  {
+    question: "Progresso no projeto pessoal?",
+    options: [
+      { label: "Sim", points: 2 },
+      { label: "Mínimo", points: 1 },
+      { label: "Nada", points: 0 }
+    ]
+  },
+  {
+    question: "Presença com família ou pessoas importantes?",
+    options: [
+      { label: "Alta", points: 2 },
+      { label: "Média", points: 1 },
+      { label: "Baixa", points: 0 }
+    ]
+  },
+  {
+    question: "Qualidade do sono?",
+    options: [
+      { label: "Boa", points: 2 },
+      { label: "Regular", points: 1 },
+      { label: "Ruim", points: 0 }
+    ]
+  },
+  {
+    question: "Consumo de conteúdo intencional?",
+    options: [
+      { label: "Sim", points: 2 },
+      { label: "Parcial", points: 1 },
+      { label: "Não", points: 0 }
+    ]
+  },
+  {
+    question: "Como está sua clareza mental agora?",
+    options: [
+      { label: "Alta", points: 2 },
+      { label: "Média", points: 1 },
+      { label: "Baixa", points: 0 }
+    ]
+  }
+];
+
+const iatMetricGroups = [
+  { label: "ruído", indexes: [0, 1, 8] },
+  { label: "presença", indexes: [4, 6, 7] },
+  { label: "continuidade", indexes: [2, 3, 5] },
+  { label: "clareza", indexes: [2, 4, 7, 9] }
 ];
 
 const thesisStatements = [
@@ -68,11 +147,6 @@ const proofCards = [
     eyebrow: "origem prática",
     value: "14 dias",
     detail: "de estrutura objetiva para sair do excesso e voltar a perceber a própria vida com mais nitidez."
-  },
-  {
-    eyebrow: "base real",
-    value: "silêncio",
-    detail: "como experiência concreta antes de virar proposta: menos ruído, menos impulso, mais presença."
   },
   {
     eyebrow: "direção",
@@ -397,6 +471,52 @@ function FaqItem({
 }
 
 export function LandingPage() {
+  const [iatAnswers, setIatAnswers] = useState<(0 | 1 | 2 | null)[]>(
+    Array.from({ length: iatQuestions.length }, () => null)
+  );
+  const [iatSlide, setIatSlide] = useState(0);
+
+  const iatScore = useMemo(
+    () => iatAnswers.reduce((total, answer) => total + (answer ?? 0), 0),
+    [iatAnswers]
+  );
+
+  const answeredCount = useMemo(
+    () => iatAnswers.filter((answer) => answer !== null).length,
+    [iatAnswers]
+  );
+
+  const iatPercent = Math.round((iatScore / 20) * 100);
+
+  const iatBars = useMemo(
+    () =>
+      iatMetricGroups.map((group) => {
+        const max = group.indexes.length * 2;
+        const total = group.indexes.reduce((sum, index) => sum + (iatAnswers[index] ?? 0), 0);
+        return {
+          label: group.label,
+          value: Math.round((total / max) * 100)
+        };
+      }),
+    [iatAnswers]
+  );
+
+  const handleIatSelect = (questionIndex: number, points: 0 | 1 | 2) => {
+    setIatAnswers((current) =>
+      current.map((answer, index) => (index === questionIndex ? points : answer))
+    );
+  };
+
+  const activeQuestion = iatQuestions[iatSlide];
+
+  const handleNextIat = () => {
+    setIatSlide((current) => (current + 1) % iatQuestions.length);
+  };
+
+  const handlePrevIat = () => {
+    setIatSlide((current) => (current - 1 + iatQuestions.length) % iatQuestions.length);
+  };
+
   return (
     <main className="bg-[#f7f7f3] text-[#111318]">
       <div className="relative overflow-hidden border-b border-black/6 bg-[linear-gradient(180deg,#fbfbf8_0%,#f6f7f4_54%,#f2f4f1_100%)]">
@@ -424,7 +544,7 @@ export function LandingPage() {
             <p className="text-[0.74rem] font-semibold uppercase tracking-[0.24em] text-[#8b94a1]">
               Desafio da Atenção — Vitor Tyso
             </p>
-            <h1 className="mt-5 text-balance font-serif text-[3.5rem] leading-[0.9] tracking-[-0.08em] text-[#111318] sm:text-[4.8rem] md:text-[6.2rem] lg:text-[7rem]">
+            <h1 className="mt-5 text-balance font-serif text-[3.15rem] leading-[0.92] tracking-[-0.085em] text-[#0c1118] sm:text-[4.3rem] md:text-[5.5rem] lg:text-[6.2rem] [text-shadow:0_1px_0_rgba(255,255,255,0.28)]">
               Sua atenção está sendo roubada.
               <br />
               E você está pagando com a sua vida.
@@ -441,59 +561,130 @@ export function LandingPage() {
           </motion.div>
 
           <motion.div
-            className="mx-auto mt-16 grid max-w-[1120px] gap-5 lg:grid-cols-[1.12fr_0.88fr]"
+            className="mx-auto mt-16 max-w-[980px]"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.25 }}
             variants={fadeUp}
           >
-            <div className="rounded-[2.5rem] border border-[rgba(134,149,170,0.18)] bg-white/54 p-6 shadow-[0_24px_80px_rgba(16,17,20,0.08)] backdrop-blur-2xl">
-              <div className="rounded-[2rem] border border-[rgba(134,149,170,0.16)] bg-[linear-gradient(180deg,rgba(255,255,255,0.82)_0%,rgba(241,245,248,0.62)_100%)] p-6 md:p-8">
-                <p className="text-[0.7rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
-                  A grande tese
-                </p>
-                <p className="mt-4 max-w-2xl text-balance font-serif text-[2rem] leading-[1.02] tracking-[-0.05em] text-[#111318] md:text-[3rem]">
-                  Talvez você não esteja perdido. Talvez exista ruído demais.
-                </p>
-                <div className="mt-8 grid gap-3 md:grid-cols-3">
-                  {["feed", "notificações", "urgências"].map((item) => (
-                    <div
-                      key={item}
-                      className="rounded-[1.4rem] border border-[rgba(134,149,170,0.16)] bg-white/72 px-4 py-4 text-sm uppercase tracking-[0.2em] text-[#66707c]"
-                    >
-                      {item}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
             <div className="rounded-[2.5rem] border border-[rgba(134,149,170,0.18)] bg-[linear-gradient(180deg,rgba(255,255,255,0.76)_0%,rgba(241,245,248,0.62)_100%)] p-5 shadow-[0_24px_80px_rgba(16,17,20,0.08)] backdrop-blur-2xl">
-              <div className="flex h-full flex-col rounded-[2rem] border border-[rgba(134,149,170,0.16)] bg-white/58 p-6">
-                <div className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
-                  Sinal mais comum
-                </div>
-                <div className="mt-5 font-serif text-4xl leading-[0.94] tracking-[-0.06em] text-[#111318]">
-                  Vida cheia. Presença baixa.
-                </div>
-                <p className="mt-4 text-base leading-7 text-[#66707c]">
-                  Você abre o celular sem perceber, consome muito, aplica pouco e sente os dias passando mais rápido do que gostaria.
-                </p>
-                <div className="mt-8 space-y-3">
-                  {[72, 54, 88, 41].map((value, index) => (
-                    <div key={index}>
-                      <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.22em] text-[#8b94a1]">
-                        <span>{["ruído", "presença", "continuidade", "clareza"][index]}</span>
-                        <span>{value}%</span>
+              <div className="rounded-[2rem] border border-[rgba(134,149,170,0.16)] bg-white/58 p-6">
+                <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
+                  <div>
+                    <div className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
+                      Índice de Atenção Tyso — IAT
+                    </div>
+                    <div className="mt-5 font-serif text-4xl leading-[0.94] tracking-[-0.06em] text-[#111318]">
+                      Meça onde sua atenção está hoje.
+                    </div>
+                    <p className="mt-4 text-base leading-7 text-[#66707c]">
+                      Você responde, acompanha o movimento das barras e registra o número do dia 1 ao dia 7.
+                    </p>
+                    <div className="mt-6 grid gap-3 rounded-[1.5rem] border border-black/6 bg-white/50 p-4 sm:grid-cols-[1fr_auto] sm:items-end">
+                      <div>
+                        <div className="text-[0.64rem] uppercase tracking-[0.22em] text-[#8b94a1]">
+                          score atual
+                        </div>
+                        <div className="mt-2 flex items-end gap-3">
+                          <span className="font-serif text-[3.2rem] leading-none tracking-[-0.07em] text-[#111318]">
+                            {iatScore}
+                          </span>
+                          <span className="mb-1 text-sm text-[#8b94a1]">/ 20</span>
+                        </div>
                       </div>
-                      <div className="h-2 rounded-full bg-black/8">
-                        <div
-                          className="h-2 rounded-full bg-[linear-gradient(90deg,#d7dde7_0%,#92a4bf_100%)]"
-                          style={{ width: `${value}%` }}
-                        />
+                      <div className="rounded-full border border-black/6 bg-[#eef2f7] px-4 py-2 text-xs uppercase tracking-[0.22em] text-[#627087]">
+                        {answeredCount}/10 respostas
                       </div>
                     </div>
-                  ))}
+                    <div className="mt-8 space-y-3">
+                      {iatBars.map((bar) => (
+                        <div key={bar.label}>
+                          <div className="mb-2 flex items-center justify-between text-xs uppercase tracking-[0.22em] text-[#8b94a1]">
+                            <span>{bar.label}</span>
+                            <span>{bar.value}%</span>
+                          </div>
+                          <div className="h-2 rounded-full bg-black/8">
+                            <div
+                              className="h-2 rounded-full bg-[linear-gradient(90deg,#d7dde7_0%,#92a4bf_100%)]"
+                              style={{ width: `${bar.value}%` }}
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-5 rounded-[1.4rem] border border-black/6 bg-white/52 p-4 text-sm leading-6 text-[#66707c]">
+                      Hoje você está em <span className="font-medium text-[#111318]">{iatPercent}%</span> do seu índice máximo. No final, compare o dia 1 com o dia 7.
+                    </div>
+                  </div>
+
+                  <div className="rounded-[1.8rem] border border-black/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.74)_0%,rgba(241,245,248,0.56)_100%)] p-5 shadow-[0_18px_50px_rgba(16,17,20,0.05)]">
+                    <div className="mb-4 flex items-center justify-between gap-4">
+                      <div className="rounded-full border border-black/6 bg-[#eff3f8] px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
+                        {String(iatSlide + 1).padStart(2, "0")}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={handlePrevIat}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/6 bg-white/76 text-[#66707c] transition hover:text-[#111318]"
+                          aria-label="Pergunta anterior"
+                        >
+                          ‹
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleNextIat}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-black/6 bg-white/76 text-[#66707c] transition hover:text-[#111318]"
+                          aria-label="Próxima pergunta"
+                        >
+                          ›
+                        </button>
+                      </div>
+                    </div>
+                    <div className="text-sm uppercase tracking-[0.2em] text-[#8b94a1]">
+                      carrossel do IAT
+                    </div>
+                    <div className="mt-4 font-serif text-[2.15rem] leading-[1] tracking-[-0.055em] text-[#111318] md:text-[2.6rem]">
+                      {activeQuestion.question}
+                    </div>
+                    <div className="mt-6 space-y-2">
+                      {activeQuestion.options.map((option) => {
+                        const selected = iatAnswers[iatSlide] === option.points;
+
+                        return (
+                          <button
+                            key={option.label}
+                            type="button"
+                            onClick={() => handleIatSelect(iatSlide, option.points as 0 | 1 | 2)}
+                            className={`w-full rounded-[1.35rem] border px-4 py-4 text-sm transition ${
+                              selected
+                                ? "border-[#8ea0bb] bg-[linear-gradient(180deg,#e1e8f1_0%,#ccd8e7_100%)] text-[#111318] shadow-[0_12px_28px_rgba(83,105,136,0.14)]"
+                                : "border-black/6 bg-white/66 text-[#66707c] hover:border-[#c4d0de] hover:text-[#111318]"
+                            }`}
+                          >
+                            <span className="block font-medium">{option.label}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="mt-5 flex flex-wrap items-center gap-2">
+                      {iatQuestions.map((item, index) => (
+                        <button
+                          key={item.question}
+                          type="button"
+                          onClick={() => setIatSlide(index)}
+                          className={`h-2.5 rounded-full transition ${
+                            index === iatSlide
+                              ? "w-10 bg-[#8ea0bb]"
+                              : iatAnswers[index] !== null
+                                ? "w-4 bg-[#c7d4e4]"
+                                : "w-2.5 bg-black/10"
+                          }`}
+                          aria-label={`Ir para pergunta ${index + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -504,39 +695,50 @@ export function LandingPage() {
       <section className="px-5 py-20 sm:px-8 md:py-28">
         <div className="mx-auto max-w-[1240px]">
           <SectionIntro
-            eyebrow="Identificação imediata"
-            title="Sinais de que sua atenção está sendo consumida"
-            subtitle="Você não precisa ler muito para saber se isso te descreve."
+            eyebrow="Índice de Atenção Tyso — IAT"
+            title="Um índice simples, mensurável e comparável entre o dia 1 e o dia 7."
+            subtitle="Você responde dez perguntas, soma de 0 a 20 pontos e registra o próprio número todos os dias durante o desafio."
           />
 
-          <div className="mt-14 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {symptomCards.map((item, index) => (
-              <motion.article
-                key={item}
-                className="group rounded-[2rem] border border-black/6 bg-white/78 p-6 shadow-[0_18px_50px_rgba(16,17,20,0.05)] backdrop-blur-xl transition hover:-translate-y-1 hover:shadow-[0_24px_65px_rgba(16,17,20,0.08)]"
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, amount: 0.22 }}
-                custom={index * 0.04}
-                variants={fadeUp}
-              >
-                <div className="mb-5 h-9 w-9 rounded-full border border-black/6 bg-[#eff3f8] p-2">
-                  <div className="h-full w-full rounded-full bg-[#8ba0bd]" />
-                </div>
-                <p className="text-lg leading-7 tracking-[-0.02em] text-[#111318]">{item}</p>
-              </motion.article>
-            ))}
+          <div className="mt-6 mx-auto max-w-3xl rounded-[1.8rem] border border-black/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.7)_0%,rgba(241,245,248,0.5)_100%)] p-5 text-center shadow-[0_18px_50px_rgba(16,17,20,0.05)] backdrop-blur-xl">
+            <p className="text-base leading-7 text-[#66707c]">
+              O IAT é o número que mostra se você entrou com a atenção dispersa e saiu com mais clareza. É uma forma de tornar a transformação visível.
+            </p>
           </div>
+
+          <motion.div
+            className="mx-auto mt-10 max-w-4xl rounded-[2rem] border border-black/6 bg-white/72 p-6 text-center shadow-[0_18px_50px_rgba(16,17,20,0.05)] backdrop-blur-xl md:p-7"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.25 }}
+            variants={fadeUp}
+          >
+            <p className="font-serif text-[2rem] leading-[1.04] tracking-[-0.045em] text-[#111318] md:text-[2.5rem]">
+              Entrei com IAT {Math.max(iatScore - 6, 0)}. Quero sair com IAT {Math.min(iatScore + 6, 20)}.
+            </p>
+            <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-[#66707c]">
+              Essa pode ser a prova mais poderosa do desafio: um número proprietário, simples de aplicar, comparável entre o dia 1 e o dia 7, e fácil de compartilhar como resultado real.
+            </p>
+          </motion.div>
         </div>
       </section>
 
       <section className="px-5 py-20 sm:px-8 md:py-28">
         <div className="mx-auto max-w-[1240px]">
-          <SectionIntro
-            eyebrow="A grande tese"
-            title="A atenção é o recurso mais valioso da sua vida."
-            subtitle="Quanto mais ruído, menos critério. Quanto menos critério, mais difícil fica sustentar direção."
-          />
+          <motion.div
+            className="mx-auto max-w-4xl text-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeUp}
+          >
+            <h2 className="text-balance font-serif text-[2.8rem] leading-[0.95] tracking-[-0.06em] text-[#111318] sm:text-[3.8rem] md:text-[5rem]">
+              A atenção é o recurso mais valioso da sua vida.
+            </h2>
+            <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-[#66707c] md:text-lg">
+              Quanto mais ruído, menos critério. Quanto menos critério, mais difícil fica sustentar direção.
+            </p>
+          </motion.div>
 
           <div className="mt-14 grid gap-5 lg:grid-cols-3">
             {thesisStatements.map((statement, index) => (
@@ -793,7 +995,22 @@ export function LandingPage() {
                 Depois de anos observando comportamento, decisão sob pressão e os efeitos do excesso sobre a execução, o trabalho deixou de ser apenas intelectual.
               </p>
               <p>
-                O Desafio da Atenção nasce de uma pergunta simples: o que muda quando você protege o que a vida moderna tenta capturar o tempo todo?
+                Passei 15 anos trabalhando em algo que não fazia sentido para mim. Atravessei 7 cidades. Fiquei anos longe da mulher que eu amava.
+              </p>
+              <p>
+                Eu estava acordado de corpo. Morto por dentro.
+              </p>
+              <p>
+                Achava que o problema era eu. Que faltava disciplina. Que algo em mim estava errado.
+              </p>
+              <p>
+                Até que entendi: o problema nunca foi eu. Foi para onde eu estava direcionando minha atenção — e quem estava se beneficiando disso.
+              </p>
+              <p>
+                Quando acordei para isso, criei um protocolo. Testei em mim mesmo. Os resultados foram concretos: clareza mental, presença recuperada, projetos saindo do papel.
+              </p>
+              <p>
+                Eu poderia ter entendido isso aos 25. Fui entender aos 40. Não quero que você espere tanto.
               </p>
             </div>
           </motion.div>
