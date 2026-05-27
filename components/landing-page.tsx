@@ -501,12 +501,6 @@ export function LandingPage() {
     [iatAnswers]
   );
 
-  const handleIatSelect = (questionIndex: number, points: 0 | 1 | 2) => {
-    setIatAnswers((current) =>
-      current.map((answer, index) => (index === questionIndex ? points : answer))
-    );
-  };
-
   const activeQuestion = iatQuestions[iatSlide];
 
   const handleNextIat = () => {
@@ -515,6 +509,16 @@ export function LandingPage() {
 
   const handlePrevIat = () => {
     setIatSlide((current) => (current - 1 + iatQuestions.length) % iatQuestions.length);
+  };
+
+  const handleIatSelect = (questionIndex: number, points: 0 | 1 | 2) => {
+    setIatAnswers((current) =>
+      current.map((answer, index) => (index === questionIndex ? points : answer))
+    );
+
+    if (questionIndex < iatQuestions.length - 1) {
+      setIatSlide(questionIndex + 1);
+    }
   };
 
   return (
@@ -570,7 +574,7 @@ export function LandingPage() {
             <div className="rounded-[2.5rem] border border-[rgba(134,149,170,0.18)] bg-[linear-gradient(180deg,rgba(255,255,255,0.76)_0%,rgba(241,245,248,0.62)_100%)] p-5 shadow-[0_24px_80px_rgba(16,17,20,0.08)] backdrop-blur-2xl">
               <div className="rounded-[2rem] border border-[rgba(134,149,170,0.16)] bg-white/58 p-6">
                 <div className="grid gap-6 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
-                  <div>
+                  <div className="order-2 lg:order-1">
                     <div className="text-[0.68rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
                       Índice de Atenção Tyso — IAT
                     </div>
@@ -617,7 +621,7 @@ export function LandingPage() {
                     </div>
                   </div>
 
-                  <div className="rounded-[1.8rem] border border-black/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.74)_0%,rgba(241,245,248,0.56)_100%)] p-5 shadow-[0_18px_50px_rgba(16,17,20,0.05)]">
+                  <div className="order-1 rounded-[1.8rem] border border-black/6 bg-[linear-gradient(180deg,rgba(255,255,255,0.74)_0%,rgba(241,245,248,0.56)_100%)] p-5 shadow-[0_18px_50px_rgba(16,17,20,0.05)] lg:order-2">
                     <div className="mb-4 flex items-center justify-between gap-4">
                       <div className="rounded-full border border-black/6 bg-[#eff3f8] px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.22em] text-[#8b94a1]">
                         {String(iatSlide + 1).padStart(2, "0")}
@@ -706,20 +710,6 @@ export function LandingPage() {
             </p>
           </div>
 
-          <motion.div
-            className="mx-auto mt-10 max-w-4xl rounded-[2rem] border border-black/6 bg-white/72 p-6 text-center shadow-[0_18px_50px_rgba(16,17,20,0.05)] backdrop-blur-xl md:p-7"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.25 }}
-            variants={fadeUp}
-          >
-            <p className="font-serif text-[2rem] leading-[1.04] tracking-[-0.045em] text-[#111318] md:text-[2.5rem]">
-              Entrei com IAT {Math.max(iatScore - 6, 0)}. Quero sair com IAT {Math.min(iatScore + 6, 20)}.
-            </p>
-            <p className="mx-auto mt-4 max-w-3xl text-base leading-7 text-[#66707c]">
-              Essa pode ser a prova mais poderosa do desafio: um número proprietário, simples de aplicar, comparável entre o dia 1 e o dia 7, e fácil de compartilhar como resultado real.
-            </p>
-          </motion.div>
         </div>
       </section>
 
