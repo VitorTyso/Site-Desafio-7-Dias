@@ -5,9 +5,8 @@ import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const waitlistConfig = {
-  ctaLabel: "Quero sair do automático",
-  link: "/lista-de-espera",
-  supportText: "Entre na lista gratuita para receber a abertura da próxima turma."
+  ctaLabel: "Quero entrar no desafio",
+  link: "https://pay.hotmart.com/W106030318O"
 };
 
 const footerConfig = {
@@ -407,6 +406,8 @@ function PrimaryCta({ className = "" }: { className?: string }) {
   return (
     <a
       href={waitlistConfig.link}
+      target="_blank"
+      rel="noreferrer"
       className={`inline-flex min-h-11 items-center justify-center rounded-full border border-black/8 bg-[#121417] px-6 text-sm font-medium text-white shadow-[0_12px_40px_rgba(10,12,16,0.12)] transition hover:bg-[#1a1f26] ${className}`}
     >
       {waitlistConfig.ctaLabel}
@@ -559,9 +560,6 @@ export function LandingPage() {
             <div className="mt-10">
               <PrimaryCta />
             </div>
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-[#8b94a1]">
-              {waitlistConfig.supportText}
-            </p>
           </motion.div>
 
           <motion.div
@@ -645,9 +643,7 @@ export function LandingPage() {
                         </button>
                       </div>
                     </div>
-                    <div className="text-sm uppercase tracking-[0.2em] text-[#8b94a1]">
-                      carrossel do IAT
-                    </div>
+                    <div className="text-sm uppercase tracking-[0.2em] text-[#8b94a1]">Diagnóstico</div>
                     <div className="mt-4 font-serif text-[2.15rem] leading-[1] tracking-[-0.055em] text-[#111318] md:text-[2.6rem]">
                       {activeQuestion.question}
                     </div>
@@ -725,9 +721,6 @@ export function LandingPage() {
             <h2 className="text-balance font-serif text-[2.8rem] leading-[0.95] tracking-[-0.06em] text-[#111318] sm:text-[3.8rem] md:text-[5rem]">
               A atenção é o recurso mais valioso da sua vida.
             </h2>
-            <p className="mx-auto mt-5 max-w-3xl text-balance text-base leading-7 text-[#66707c] md:text-lg">
-              Quanto mais ruído, menos critério. Quanto menos critério, mais difícil fica sustentar direção.
-            </p>
           </motion.div>
 
           <div className="mt-14 grid gap-5 lg:grid-cols-3">
@@ -754,33 +747,9 @@ export function LandingPage() {
       </section>
 
       <section className="px-5 py-20 sm:px-8 md:py-28">
-        <div className="mx-auto grid max-w-[1240px] gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+        <div className="mx-auto max-w-[1240px]">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeUp}
-          >
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[#8b94a1]">
-              Analogia do ruído
-            </p>
-            <h2 className="mt-4 text-balance font-serif text-[2.8rem] leading-[0.96] tracking-[-0.06em] text-[#111318] sm:text-[3.8rem] md:text-[5rem]">
-              Quando procuramos um endereço, instintivamente abaixamos o volume do carro.
-            </h2>
-            <div className="mt-6 space-y-4 text-lg leading-8 text-[#66707c] md:text-[1.32rem] md:leading-[1.65]">
-              <p>Mas quando tentamos encontrar direção na vida, fazemos o contrário.</p>
-              <p>Aumentamos o feed, o ruído, as distrações e os estímulos.</p>
-              <p className="font-medium text-[#111318]">
-                Talvez o problema não seja falta de direção. Talvez exista ruído demais.
-              </p>
-            </div>
-            <div className="mt-8">
-              <PrimaryCta />
-            </div>
-          </motion.div>
-
-          <motion.div
-            className="rounded-[2.5rem] border border-black/6 bg-[linear-gradient(180deg,#fafbfd_0%,#eef2f6_100%)] p-5 shadow-[0_28px_90px_rgba(16,17,20,0.08)]"
+            className="mx-auto max-w-[840px] rounded-[2.5rem] border border-black/6 bg-[linear-gradient(180deg,#fafbfd_0%,#eef2f6_100%)] p-5 shadow-[0_28px_90px_rgba(16,17,20,0.08)]"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.25 }}
@@ -905,7 +874,6 @@ export function LandingPage() {
           <SectionIntro
             eyebrow="Base real"
             title="Antes de ser ensinado, foi testado na prática."
-            subtitle="Ainda sem depoimentos públicos da primeira turma. Por honestidade, a prova nesta página começa pelos resultados que deram origem ao protocolo."
           />
 
           <div className="mt-14 grid gap-5 md:grid-cols-3">
@@ -930,17 +898,6 @@ export function LandingPage() {
             ))}
           </div>
 
-          <motion.div
-            className="mx-auto mt-8 max-w-4xl rounded-[2.3rem] border border-[#b8c6d9] bg-[linear-gradient(180deg,rgba(230,236,243,0.72)_0%,rgba(255,255,255,0.82)_100%)] p-8 text-center shadow-[0_18px_50px_rgba(16,17,20,0.04)]"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.25 }}
-            variants={fadeUp}
-          >
-            <p className="text-lg leading-8 text-[#66707c] md:text-[1.2rem] md:leading-[1.75]">
-              O desafio nasceu de uma hipótese pessoal: quando a atenção volta para o lugar, a vida volta a andar. A primeira turma entra em seguida. Os relatos públicos entram aqui à medida que forem acontecendo.
-            </p>
-          </motion.div>
         </div>
       </section>
 
@@ -980,10 +937,6 @@ export function LandingPage() {
               Um protocolo construído a partir de observação, excesso e reconstrução prática.
             </h2>
             <div className="mt-6 space-y-4 text-base leading-7 text-[#66707c] md:text-lg">
-              <p>Pesquisador independente sobre atenção, sobrecarga informacional e clareza mental.</p>
-              <p>
-                Depois de anos observando comportamento, decisão sob pressão e os efeitos do excesso sobre a execução, o trabalho deixou de ser apenas intelectual.
-              </p>
               <p>
                 Passei 15 anos trabalhando em algo que não fazia sentido para mim. Atravessei 7 cidades. Fiquei anos longe da mulher que eu amava.
               </p>
