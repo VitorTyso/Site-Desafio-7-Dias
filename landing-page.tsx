@@ -478,7 +478,7 @@ export function LandingPage() {
   const [iatSlide, setIatSlide] = useState(0);
 
   const iatScore = useMemo(
-    () => iatAnswers.reduce((total, answer) => total + (answer ?? 0), 0),
+    () => iatAnswers.reduce<number>((total, answer) => total + (answer ?? 0), 0),
     [iatAnswers]
   );
 
